@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, DollarSign, Building, Search, Filter } from "lucide-react";
+import { MapPin, Clock, DollarSign, Building, Search, Filter, CheckCircle2 } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const JobFeed = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,68 +18,33 @@ const JobFeed = () => {
   const jobs = [
     {
       id: 1,
-      title: "Registered Nurse - ICU",
-      company: "Mayo Clinic",
-      location: "Rochester, MN",
+      title: "Senior Registered Nurse - ICU",
+      company: "Metro Health Hospital",
+      location: "New York, NY",
       type: "Full-time",
-      salary: "$75,000 - $95,000",
-      posted: "2 hours ago",
-      description: "Join our world-renowned ICU team. We're looking for experienced RNs with critical care experience.",
-      requirements: ["BSN required", "2+ years ICU experience", "Active RN license"],
-      benefits: ["Health insurance", "401k matching", "Tuition reimbursement"],
-      urgent: true
+      category: "Nursing",
+      salary: "$85,000 - $110,000",
+      description: "Metro Health Hospital is seeking an experienced Senior Registered Nurse to join our Intensive Care Unit team. As a Senior RN in our ICU, you will be responsible for providing exceptional patient care to critically ill patients, collaborating with interdisciplinary teams, and mentoring junior staff members. This role requires advanced clinical skills, strong leadership abilities, and a commitment to excellence in patient outcomes."
     },
     {
       id: 2,
-      title: "Travel Nurse - Emergency Department",
-      company: "Johns Hopkins Hospital",
-      location: "Baltimore, MD",
-      type: "Contract",
-      salary: "$3,200 - $4,100/week",
-      posted: "4 hours ago",
-      description: "13-week travel assignment in our busy ED. Great opportunity to work at a top-tier hospital.",
-      requirements: ["Active RN license", "BLS/ACLS certified", "2+ years ED experience"],
-      benefits: ["Housing stipend", "Travel reimbursement", "Health benefits"],
-      urgent: false
+      title: "Medical Laboratory Technician",
+      company: "Diagnostic Labs Inc.",
+      location: "Chicago, IL",
+      type: "Full-time",
+      category: "Laboratory",
+      salary: "$52,000 - $68,000",
+      description: "Diagnostic Labs Inc. is seeking a skilled Medical Laboratory Technician to perform complex laboratory tests and procedures. About the Role: This position plays a crucial role in our laboratory operations, conducting diagnostic tests that help physicians make accurate diagnoses. You will work with advanced laboratory equipment, maintain quality control standards, and ensure accurate test results."
     },
     {
       id: 3,
-      title: "Nurse Practitioner - Family Medicine",
-      company: "Cleveland Clinic",
-      location: "Cleveland, OH",
+      title: "Pharmacist - Clinical",
+      company: "CareFirst Pharmacy",
+      location: "Seattle, WA",
       type: "Full-time",
-      salary: "$110,000 - $130,000",
-      posted: "6 hours ago",
-      description: "Join our primary care team providing comprehensive family medicine services.",
-      requirements: ["MSN required", "NP certification", "Active license"],
-      benefits: ["Comprehensive benefits", "CME allowance", "Flexible schedule"],
-      urgent: false
-    },
-    {
-      id: 4,
-      title: "ICU Travel Nurse",
-      company: "Massachusetts General Hospital",
-      location: "Boston, MA",
-      type: "Contract",
-      salary: "$3,500 - $4,200/week",
-      posted: "8 hours ago",
-      description: "High-acuity ICU position at one of the nation's top hospitals.",
-      requirements: ["BSN preferred", "3+ years ICU experience", "Active RN license"],
-      benefits: ["Premium pay", "Housing assistance", "Health insurance"],
-      urgent: true
-    },
-    {
-      id: 5,
-      title: "Pediatric Nurse",
-      company: "Children's Hospital of Philadelphia",
-      location: "Philadelphia, PA",
-      type: "Full-time",
-      salary: "$70,000 - $85,000",
-      posted: "1 day ago",
-      description: "Make a difference in children's lives. Join our dedicated pediatric team.",
-      requirements: ["BSN required", "Pediatric experience preferred", "Active RN license"],
-      benefits: ["Childcare assistance", "Health benefits", "Professional development"],
-      urgent: false
+      category: "Pharmacy",
+      salary: "$120,000 - $145,000",
+      description: "CareFirst Pharmacy is looking for a Clinical Pharmacist to join our innovative patient care team. Position Overview: As a Clinical Pharmacist, you will work directly with patients and healthcare providers to optimize medication therapy and improve patient outcomes. This role involves medication management, patient counseling, and collaboration with medical teams."
     }
   ];
 
@@ -85,146 +52,137 @@ const JobFeed = () => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedLocation === "all" || !selectedLocation || job.category === selectedLocation;
     const matchesLocation = selectedLocation === "all" || !selectedLocation || job.location.includes(selectedLocation);
     const matchesType = selectedType === "all" || !selectedType || job.type === selectedType;
     
-    return matchesSearch && matchesLocation && matchesType;
+    return matchesSearch && (matchesCategory || matchesLocation) && matchesType;
   });
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Healthcare Jobs
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Find your next healthcare opportunity. Browse thousands of nursing and allied health positions.
-            </p>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search jobs, companies, locations..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      {/* <section className="py-20 bg-gray-50"> */}
+      <div className="pt-32 pb-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-7xl mx-auto">
+            
+            {/* Filter Jobs Section */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Filter Jobs</h2>
               
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger>
-                  <MapPin className="w-4 h-4 mr-2" />
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="MN">Minnesota</SelectItem>
-                  <SelectItem value="MD">Maryland</SelectItem>
-                  <SelectItem value="OH">Ohio</SelectItem>
-                  <SelectItem value="MA">Massachusetts</SelectItem>
-                  <SelectItem value="PA">Pennsylvania</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="space-y-4">
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Input
+                      placeholder="Search jobs..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 h-12 text-lg"
+                    />
+                  </div>
+                  
+                  {/* Filter Dropdowns */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="All Categories" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        <SelectItem value="Nursing">Nursing</SelectItem>
+                        <SelectItem value="Laboratory">Laboratory</SelectItem>
+                        <SelectItem value="Pharmacy">Pharmacy</SelectItem>
+                        <SelectItem value="Therapy">Therapy</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger>
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue placeholder="Job Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Full-time">Full-time</SelectItem>
-                  <SelectItem value="Contract">Contract</SelectItem>
-                  <SelectItem value="Part-time">Part-time</SelectItem>
-                </SelectContent>
-              </Select>
+                    <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="All Locations" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Locations</SelectItem>
+                        <SelectItem value="NY">New York, NY</SelectItem>
+                        <SelectItem value="IL">Chicago, IL</SelectItem>
+                        <SelectItem value="WA">Seattle, WA</SelectItem>
+                        <SelectItem value="CA">Los Angeles, CA</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                Search Jobs
-              </Button>
+                    <Select value={selectedType} onValueChange={setSelectedType}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="All Types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="Full-time">Full-time</SelectItem>
+                        <SelectItem value="Part-time">Part-time</SelectItem>
+                        <SelectItem value="Contract">Contract</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Job Listings */}
-          <div className="space-y-6">
-            {filteredJobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CardTitle className="text-xl text-gray-900">{job.title}</CardTitle>
-                        {job.urgent && (
-                          <Badge variant="destructive" className="text-xs">
-                            Urgent
-                          </Badge>
-                        )}
+            {/* Full Access Jobs Available Section */}
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                {filteredJobs.length} Full Access Jobs Available
+              </h2>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {filteredJobs.map((job) => (
+                  <Card key={job.id} className="bg-white rounded-lg shadow-sm border hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <CardTitle className="text-lg font-bold text-gray-800 leading-tight">
+                          {job.title}
+                        </CardTitle>
+                        <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Full Access
+                        </Badge>
                       </div>
-                      <div className="flex items-center text-gray-600 mb-2">
-                        <Building className="w-4 h-4 mr-1" />
-                        <span className="font-medium">{job.company}</span>
+                      
+                      <div className="text-teal-600 font-medium text-lg mb-3">
+                        {job.company}
                       </div>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-1" />
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2" />
                           {job.location}
                         </div>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {job.posted}
-                        </div>
-                        <div className="flex items-center">
-                          <DollarSign className="w-4 h-4 mr-1" />
+                        <div className="flex items-center text-green-600 font-medium">
+                          <DollarSign className="w-4 h-4 mr-2" />
                           {job.salary}
                         </div>
-                        <Badge variant="outline">{job.type}</Badge>
                       </div>
-                    </div>
-                    <div className="mt-4 md:mt-0 md:ml-4">
-                      <Button className="w-full md:w-auto bg-blue-600 hover:bg-blue-700">
-                        Apply Now
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 mb-4">{job.description}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Requirements:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        {job.requirements.map((req, index) => (
-                          <li key={index} className="flex items-start">
-                            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                            {req}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Benefits:</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        {job.benefits.map((benefit, index) => (
-                          <li key={index} className="flex items-start">
-                            <span className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                            {benefit}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                      
+                      <div className="flex gap-2 mt-3">
+                        <Badge variant="outline" className="text-gray-600 bg-gray-50">
+                          <Building className="w-3 h-3 mr-1" />
+                          {job.category || 'Healthcare'}
+                        </Badge>
+                        <Badge variant="outline" className="text-gray-600 bg-gray-50">
+                          {job.type}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0">
+                      <p className="text-gray-700 text-sm leading-relaxed">
+                        {job.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
 
           {/* Load More Button */}
           <div className="text-center mt-12">
@@ -234,8 +192,12 @@ const JobFeed = () => {
           </div>
         </div>
       </div>
-    </section>
+    </div>
+    <Footer />
+    </div>
   );
 };
 
-export default JobFeed;
+export default function JobsPage() {
+  return <JobFeed />;
+}

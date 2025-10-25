@@ -21,22 +21,22 @@ const Footer = () => {
               <h4 className="font-bold mb-4 text-gold">Quick Links</h4>
               <ul className="space-y-2">
                 <li>
-                  <a href="#home" className="text-primary-foreground/80 hover:text-secondary transition-colors">
+                  <a href="/#home" className="text-primary-foreground/80 hover:text-secondary transition-colors">
                     Home
                   </a>
                 </li>
                 <li>
-                  <a href="#about" className="text-primary-foreground/80 hover:text-secondary transition-colors">
+                  <a href="/#about" className="text-primary-foreground/80 hover:text-secondary transition-colors">
                     About Us
                   </a>
                 </li>
                 <li>
-                  <a href="#services" className="text-primary-foreground/80 hover:text-secondary transition-colors">
+                  <a href="/#services" className="text-primary-foreground/80 hover:text-secondary transition-colors">
                     Services
                   </a>
                 </li>
                 <li>
-                  <a href="#team" className="text-primary-foreground/80 hover:text-secondary transition-colors">
+                  <a href="/#team" className="text-primary-foreground/80 hover:text-secondary transition-colors">
                     Team
                   </a>
                 </li>
@@ -50,7 +50,7 @@ const Footer = () => {
                 Ready to transform your healthcare staffing?
               </p>
               <a 
-                href="#contact" 
+                href="/#contact" 
                 className="inline-block mt-4 text-accent hover:text-accent/80 transition-colors font-semibold"
               >
                 Schedule a consultation →
@@ -59,7 +59,7 @@ const Footer = () => {
           </div>
 
           <div className="border-t border-primary-foreground/20 pt-8 text-center text-primary-foreground/60 text-sm">
-            <p>© 2024 eHealthJOBS. All rights reserved.</p>
+            <p>© 2025 eHealthJOBS. All rights reserved.</p>
           </div>
         </div>
       </div>
