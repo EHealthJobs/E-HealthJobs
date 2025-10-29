@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import axios from '@/lib/axiosInstance';
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,49 +15,60 @@ const JobFeed = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedType, setSelectedType] = useState("");
-
-  const jobs = [
+  const [jobs, setJobs] = useState( [
     {
       id: 1,
       title: "Senior Registered Nurse - ICU",
-      company: "Metro Health Hospital",
+      name: "Metro Health Hospital",
       location: "New York, NY",
-      type: "Full-time",
-      category: "Nursing",
-      salary: "$85,000 - $110,000",
+      employment_type: "Full-time",
+      department: "Nursing",
+      salary_range: "$85,000 - $110,000",
       description: "Metro Health Hospital is seeking an experienced Senior Registered Nurse to join our Intensive Care Unit team. As a Senior RN in our ICU, you will be responsible for providing exceptional patient care to critically ill patients, collaborating with interdisciplinary teams, and mentoring junior staff members. This role requires advanced clinical skills, strong leadership abilities, and a commitment to excellence in patient outcomes."
     },
     {
       id: 2,
       title: "Medical Laboratory Technician",
-      company: "Diagnostic Labs Inc.",
+      name: "Diagnostic Labs Inc.",
       location: "Chicago, IL",
-      type: "Full-time",
-      category: "Laboratory",
-      salary: "$52,000 - $68,000",
+      employment_type: "Full-time",
+      department: "Laboratory",
+      salary_range: "$52,000 - $68,000",
       description: "Diagnostic Labs Inc. is seeking a skilled Medical Laboratory Technician to perform complex laboratory tests and procedures. About the Role: This position plays a crucial role in our laboratory operations, conducting diagnostic tests that help physicians make accurate diagnoses. You will work with advanced laboratory equipment, maintain quality control standards, and ensure accurate test results."
     },
     {
       id: 3,
       title: "Pharmacist - Clinical",
-      company: "CareFirst Pharmacy",
+      name: "CareFirst Pharmacy",
       location: "Seattle, WA",
-      type: "Full-time",
-      category: "Pharmacy",
-      salary: "$120,000 - $145,000",
+      employment_type: "Full-time",
+      department: "Pharmacy",
+      salary_range: "$120,000 - $145,000",
       description: "CareFirst Pharmacy is looking for a Clinical Pharmacist to join our innovative patient care team. Position Overview: As a Clinical Pharmacist, you will work directly with patients and healthcare providers to optimize medication therapy and improve patient outcomes. This role involves medication management, patient counseling, and collaboration with medical teams."
     }
-  ];
+  ]);
+ useEffect(() => {
+            axios.get(`/api/scrapejobs`)
+                .then(res => {
+                console.log('Job Record:', res.data.result);
+                console.log('Job Record:', res);
+                    setJobs(res.data.result);
+                })
+                .catch(err => console.error('Error:', err));
+       
+
+    }, []);
+ 
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedLocation === "all" || !selectedLocation || job.category === selectedLocation;
+    const matchesdepartment = selectedLocation === "all" || !selectedLocation || job.department === selectedLocation;
     const matchesLocation = selectedLocation === "all" || !selectedLocation || job.location.includes(selectedLocation);
-    const matchesType = selectedType === "all" || !selectedType || job.type === selectedType;
+    const matchesType = selectedType === "all" || !selectedType || job.employment_type === selectedType;
     
-    return matchesSearch && (matchesCategory || matchesLocation) && matchesType;
+    return matchesSearch && (matchesdepartment || matchesLocation) && matchesType;
   });
 
   return (
@@ -144,12 +156,11 @@ const JobFeed = () => {
                         </CardTitle>
                         <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
-                          Full Access
-                        </Badge>
+Apply                        </Badge>
                       </div>
                       
                       <div className="text-teal-600 font-medium text-lg mb-3">
-                        {job.company}
+                        {job.name}
                       </div>
                       
                       <div className="space-y-2">
@@ -157,19 +168,19 @@ const JobFeed = () => {
                           <MapPin className="w-4 h-4 mr-2" />
                           {job.location}
                         </div>
-                        <div className="flex items-center text-green-600 font-medium">
-                          <DollarSign className="w-4 h-4 mr-2" />
-                          {job.salary}
-                        </div>
+                         {job.salary_range ?<div className="flex items-center text-green-600 font-medium">
+                     
+                          {job.salary_range}
+                        </div>:null}
                       </div>
                       
                       <div className="flex gap-2 mt-3">
                         <Badge variant="outline" className="text-gray-600 bg-gray-50">
                           <Building className="w-3 h-3 mr-1" />
-                          {job.category || 'Healthcare'}
+                          {job.department || 'Healthcare'}
                         </Badge>
                         <Badge variant="outline" className="text-gray-600 bg-gray-50">
-                          {job.type}
+                          {job.employment_type}
                         </Badge>
                       </div>
                     </CardHeader>
