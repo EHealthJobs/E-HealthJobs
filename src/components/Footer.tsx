@@ -7,9 +7,13 @@ const Footer = () => {
             {/* Logo and tagline */}
             <div>
               <div className="text-2xl font-bold mb-4">
-                <span className="text-secondary">e</span>
-                <span>Health</span>
-                <span className="text-secondary ml-1">JOBS</span>
+                <img
+                src="https://static.wixstatic.com/media/790a51_606f3f9208aa404bbf8268164deecdb3~mv2.png/v1/fill/w_670,h_274,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/790a51_606f3f9208aa404bbf8268164deecdb3~mv2.png"
+                alt="Logo"
+                width={180}
+                height={180}
+                className="bject-contain"
+              />
               </div>
               <p className="text-primary-foreground/80">
                 Global recruitment solutions for healthcare professionals

@@ -2,34 +2,81 @@
 
 import { NextResponse } from 'next/server';
 import pool from '../../../lib/db';
-import bcrypt from 'bcrypt';
-
 
 export async function GET(req) {
+  const client = await pool.connect();
+
   try {
-   
-    const client = await pool.connect();
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get('page')) || 1;
+    const limit = parseInt(searchParams.get('limit')) || 10;
+    const offset = (page - 1) * limit;
 
-      
-      const check = await client.query('SELECT *,hospitals.name FROM job_board join hospitals on job_board.hospital_id=hospitals.id');
+    const search = searchParams.get('search') || '';
+    const location = searchParams.get('location') || '';
+    const type = searchParams.get('type') || '';
 
-      console.log(
-        "check-0>",check
-      );
-      
-      if (check.rows.length > 0) {
-        return NextResponse.json(
-          { success: true, result: check.rows },
-          { status: 200 }
-        );
-      }
+    // Build dynamic filters
+    let conditions = [];
+    let values = [];
 
+    if (search) {
+      values.push(`%${search}%`);
+      conditions.push(`(job_board.title ILIKE $${values.length} OR hospitals.name ILIKE $${values.length})`);
+    }
+
+    if (location && location !== 'all') {
+      values.push(`%${location}%`);
+      conditions.push(`job_board.location ILIKE $${values.length}`);
+    }
+
+    if (type && type !== 'all') {
+      values.push(type);
+      conditions.push(`job_board.type = $${values.length}`);
+    }
+
+    let whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    // Fetch data with pagination
+    const query = `
+      SELECT job_board.*, hospitals.name AS hospital_name
+      FROM job_board
+      JOIN hospitals ON job_board.hospital_id = hospitals.id
+      ${whereClause}
+      ORDER BY job_board.created_at DESC
+      LIMIT ${limit} OFFSET ${offset};
+    `;
+
+    const countQuery = `
+      SELECT COUNT(*) AS total
+      FROM job_board
+      JOIN hospitals ON job_board.hospital_id = hospitals.id
+      ${whereClause};
+    `;
+
+    const [result, countResult] = await Promise.all([
+      client.query(query, values),
+      client.query(countQuery, values),
+    ]);
+
+    return NextResponse.json(
+      {
+        success: true,
+        jobs: result.rows,
+        total: parseInt(countResult.rows[0].total),
+        page,
+        limit,
+      },
+      { status: 200 }
+    );
 
   } catch (err) {
-    console.error('Signup error:', err);
+    console.error('GET /api/jobs error:', err);
     return NextResponse.json(
-      { success: false, message: 'Internal Server Error',error:err },
+      { success: false, message: 'Internal Server Error', error: err.message },
       { status: 500 }
     );
+  } finally {
+    client.release();
   }
 }
