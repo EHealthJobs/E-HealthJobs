@@ -37,7 +37,8 @@ const JobFeed = () => {
       description: "Join our world-renowned ICU team. We're looking for experienced RNs with critical care experience.",
       requirements: ["BSN required", "2+ years ICU experience", "Active RN license"],
       benefits: ["Health insurance", "401k matching", "Tuition reimbursement"],
-      urgent: true
+      urgent: true,
+      job_url: "https://www.mayoclinic.org/jobs"
     },
     {
       id: 2,
@@ -51,7 +52,8 @@ const JobFeed = () => {
       description: "13-week travel assignment in our busy ED. Great opportunity to work at a top-tier hospital.",
       requirements: ["Active RN license", "BLS/ACLS certified", "2+ years ED experience"],
       benefits: ["Housing stipend", "Travel reimbursement", "Health benefits"],
-      urgent: false
+      urgent: false,
+      job_url: "https://www.hopkinsmedicine.org/careers"
     },
     {
       id: 3,
@@ -64,7 +66,9 @@ const JobFeed = () => {
       description: "Join our primary care team providing comprehensive family medicine services.",
       requirements: ["MSN required", "NP certification", "Active license"],
       benefits: ["Comprehensive benefits", "CME allowance", "Flexible schedule"],
-      urgent: false
+      urgent: false,
+      job_url: "https://my.clevelandclinic.org/hr/careers"
+
     },
     {
       id: 4,
@@ -78,7 +82,8 @@ const JobFeed = () => {
       description: "High-acuity ICU position at one of the nation's top hospitals.",
       requirements: ["BSN preferred", "3+ years ICU experience", "Active RN license"],
       benefits: ["Premium pay", "Housing assistance", "Health insurance"],
-      urgent: true
+      urgent: true,
+      job_url: "https://www.massgeneral.org/careers"
     },
     {
       id: 5,
@@ -92,7 +97,8 @@ const JobFeed = () => {
       description: "Make a difference in children's lives. Join our dedicated pediatric team.",
       requirements: ["BSN required", "Pediatric experience preferred", "Active RN license"],
       benefits: ["Childcare assistance", "Health benefits", "Professional development"],
-      urgent: false
+      urgent: false,
+      job_url: "https://www.chop.edu/careers"
     }
   ];
   const [searchTerm, setSearchTerm] = useState("");
@@ -239,10 +245,12 @@ const JobFeed = () => {
                     <CardTitle className="text-lg font-bold text-gray-800 leading-tight">
                       {job.title}
                     </CardTitle>
-                    <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      Apply
-                    </Badge>
+                    <a href={job.job_url} target="_blank" rel="noopener noreferrer">
+                      <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1 hover:bg-green-600 hover:text-white transition-colors cursor-pointer">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Apply
+                      </Badge>
+                    </a>
                   </div>
 
                   <div className="text-teal-600 font-medium text-lg mb-3">

@@ -3,9 +3,7 @@ const path = require('path');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    turbo: false, // 👈 disables Turbopack
-  },
+  turbopack: {}, // 👈 Add this to silence the warning
   webpack(config) {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
