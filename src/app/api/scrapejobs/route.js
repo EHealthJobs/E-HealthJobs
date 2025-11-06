@@ -43,7 +43,7 @@ export async function GET(req) {
       FROM job_board
       JOIN hospitals ON job_board.hospital_id = hospitals.id
       ${whereClause}
-      ORDER BY job_board.created_at ASC
+      ORDER BY job_board.created_at DESC
       LIMIT ${limit} OFFSET ${offset};
     `;
 

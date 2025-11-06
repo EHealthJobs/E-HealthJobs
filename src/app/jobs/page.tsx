@@ -254,13 +254,17 @@ const JobFeed = () => {
                   </div>
 
                   <div className="text-teal-600 font-medium text-lg mb-3">
-                    {job.name}
+                    {job?.name}
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex items-center text-gray-600">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {job.location}
+                      {job.location ? (
+                        <div className="flex items-center">
+                          <MapPin className="w-4 h-4 mr-2" />
+                          {job.location}
+                        </div>
+                      ) : null}
                     </div>
                     {job.salary_range && (
                       <div className="flex items-center text-green-600 font-medium">
