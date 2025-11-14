@@ -179,7 +179,8 @@ const JobFeed = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Commented for now - filters can be added later   */}
+              {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Select
                   value={selectedCategory}
                   onValueChange={setSelectedCategory}
@@ -223,7 +224,7 @@ const JobFeed = () => {
                     <SelectItem value="Contract">Contract</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -231,7 +232,7 @@ const JobFeed = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             {loading && jobs.length === 0
               ? "Loading jobs..."
-              : `${jobs.length} Jobs Found`}
+              : `Showing ${jobs.length} of ${total} jobs.`}
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
