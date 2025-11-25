@@ -102,3 +102,71 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Big colorful mesh background */
+.hero-mesh-bg {
+  position: relative;
+  background-color: #05091a;
+  background-image:
+    radial-gradient(circle at 15% 10%, #284bff 0, #182b6b 35%, transparent 65%),
+    radial-gradient(circle at 85% 8%, #b357ff 0, #7c3aed 35%, transparent 70%),
+    radial-gradient(circle at 12% 85%, #1d4ed8 0, #02081a 55%, transparent 75%),
+    radial-gradient(circle at 88% 88%, #ff9800 0, #f97316 35%, transparent 75%),
+    linear-gradient(to bottom, #05091a, #020617);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Glow band behind headline */
+.hero-mesh-band {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1100px;
+  height: 260px;
+  border-radius: 56px;
+  background-image: radial-gradient(
+    circle at 50% 20%,
+    rgba(120, 160, 255, 0.9),
+    rgba(26, 63, 160, 0.96),
+    rgba(4, 8, 32, 0.98)
+  );
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+  z-index: -10;
+}
+
+/* Purple / orange wave under card */
+.hero-mesh-wave {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1300px;
+  height: 520px;
+  border-radius: 60%;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(79, 70, 229, 0.8), transparent 60%),
+    radial-gradient(circle at 40% 50%, rgba(236, 72, 153, 0.9), transparent 70%),
+    radial-gradient(circle at 80% 65%, rgba(249, 115, 22, 0.95), transparent 70%);
+  pointer-events: none;
+  z-index: -10;
+}
+
+/* Grid floor at bottom */
+.hero-grid-floor {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -5%;
+  height: 40%;
+  background-image:
+    radial-gradient(circle at top, rgba(3, 7, 18, 0.9), transparent 70%),
+    linear-gradient(to right, rgba(148, 163, 184, 0.2) 1px, transparent 1px),
+    linear-gradient(to top, rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+  background-size: auto, 80px 80px, 80px 80px;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: -10;
+}
+
