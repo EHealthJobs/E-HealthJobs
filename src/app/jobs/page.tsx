@@ -23,84 +23,84 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const JobFeed = () => {
-   const dummyjobs = [
-    {
-      id: 1,
-      title: "Registered Nurse - ICU",
-      name: "Mayo Clinic",
-       department: "Nursing",
-      location: "Rochester, MN",
-      employment_type: "Full-time",
-      salary_range: "$75,000 - $95,000",
-      posted: "2 hours ago",
-      description: "Join our world-renowned ICU team. We're looking for experienced RNs with critical care experience.",
-      requirements: ["BSN required", "2+ years ICU experience", "Active RN license"],
-      benefits: ["Health insurance", "401k matching", "Tuition reimbursement"],
-      urgent: true,
-      job_url: "https://www.mayoclinic.org/jobs"
-    },
-    {
-      id: 2,
-      title: "Travel Nurse - Emergency Department",
-      name: "Johns Hopkins Hospital",
-      location: "Baltimore, MD",
-      employment_type: "Contract",
-      salary_range: "$3,200 - $4,100/week",
-      posted: "4 hours ago",
-       department: "Pharmacy",
-      description: "13-week travel assignment in our busy ED. Great opportunity to work at a top-tier hospital.",
-      requirements: ["Active RN license", "BLS/ACLS certified", "2+ years ED experience"],
-      benefits: ["Housing stipend", "Travel reimbursement", "Health benefits"],
-      urgent: false,
-      job_url: "https://www.hopkinsmedicine.org/careers"
-    },
-    {
-      id: 3,
-      title: "Nurse Practitioner - Family Medicine",
-      name: "Cleveland Clinic",
-      location: "Cleveland, OH",
-      employment_type: "Full-time",
-      salary_range: "$110,000 - $130,000",
-      posted: "6 hours ago", department: "Nursing",
-      description: "Join our primary care team providing comprehensive family medicine services.",
-      requirements: ["MSN required", "NP certification", "Active license"],
-      benefits: ["Comprehensive benefits", "CME allowance", "Flexible schedule"],
-      urgent: false,
-      job_url: "https://my.clevelandclinic.org/hr/careers"
+  const JobFeed = () => {
+    const dummyjobs = [
+      {
+        id: 1,
+        title: "Registered Nurse - ICU",
+        name: "Mayo Clinic",
+        department: "Nursing",
+        location: "Rochester, MN",
+        employment_type: "Full-time",
+        salary_range: "$75,000 - $95,000",
+        posted: "2 hours ago",
+        description: "Join our world-renowned ICU team. We're looking for experienced RNs with critical care experience.",
+        requirements: ["BSN required", "2+ years ICU experience", "Active RN license"],
+        benefits: ["Health insurance", "401k matching", "Tuition reimbursement"],
+        urgent: true,
+        job_url: "https://www.mayoclinic.org/jobs"
+      },
+      {
+        id: 2,
+        title: "Travel Nurse - Emergency Department",
+        name: "Johns Hopkins Hospital",
+        location: "Baltimore, MD",
+        employment_type: "Contract",
+        salary_range: "$3,200 - $4,100/week",
+        posted: "4 hours ago",
+        department: "Pharmacy",
+        description: "13-week travel assignment in our busy ED. Great opportunity to work at a top-tier hospital.",
+        requirements: ["Active RN license", "BLS/ACLS certified", "2+ years ED experience"],
+        benefits: ["Housing stipend", "Travel reimbursement", "Health benefits"],
+        urgent: false,
+        job_url: "https://www.hopkinsmedicine.org/careers"
+      },
+      {
+        id: 3,
+        title: "Nurse Practitioner - Family Medicine",
+        name: "Cleveland Clinic",
+        location: "Cleveland, OH",
+        employment_type: "Full-time",
+        salary_range: "$110,000 - $130,000",
+        posted: "6 hours ago", department: "Nursing",
+        description: "Join our primary care team providing comprehensive family medicine services.",
+        requirements: ["MSN required", "NP certification", "Active license"],
+        benefits: ["Comprehensive benefits", "CME allowance", "Flexible schedule"],
+        urgent: false,
+        job_url: "https://my.clevelandclinic.org/hr/careers"
 
-    },
-    {
-      id: 4,
-      title: "ICU Travel Nurse",
-      name: "Massachusetts General Hospital",
-      location: "Boston, MA",
-      employment_type: "Contract",
-      salary_range: "$3,500 - $4,200/week",
-      posted: "8 hours ago",
-       department: "Pharmacy",
-      description: "High-acuity ICU position at one of the nation's top hospitals.",
-      requirements: ["BSN preferred", "3+ years ICU experience", "Active RN license"],
-      benefits: ["Premium pay", "Housing assistance", "Health insurance"],
-      urgent: true,
-      job_url: "https://www.massgeneral.org/careers"
-    },
-    {
-      id: 5,
-      title: "Pediatric Nurse",
-      name: "Children's Hospital of Philadelphia",
-      location: "Philadelphia, PA",
-      employment_type: "Full-time",
-      salary_range: "$70,000 - $85,000",
-      posted: "1 day ago",
-      department: "Laboratory",
-      description: "Make a difference in children's lives. Join our dedicated pediatric team.",
-      requirements: ["BSN required", "Pediatric experience preferred", "Active RN license"],
-      benefits: ["Childcare assistance", "Health benefits", "Professional development"],
-      urgent: false,
-      job_url: "https://www.chop.edu/careers"
-    }
-  ];
+      },
+      {
+        id: 4,
+        title: "ICU Travel Nurse",
+        name: "Massachusetts General Hospital",
+        location: "Boston, MA",
+        employment_type: "Contract",
+        salary_range: "$3,500 - $4,200/week",
+        posted: "8 hours ago",
+        department: "Pharmacy",
+        description: "High-acuity ICU position at one of the nation's top hospitals.",
+        requirements: ["BSN preferred", "3+ years ICU experience", "Active RN license"],
+        benefits: ["Premium pay", "Housing assistance", "Health insurance"],
+        urgent: true,
+        job_url: "https://www.massgeneral.org/careers"
+      },
+      {
+        id: 5,
+        title: "Pediatric Nurse",
+        name: "Children's Hospital of Philadelphia",
+        location: "Philadelphia, PA",
+        employment_type: "Full-time",
+        salary_range: "$70,000 - $85,000",
+        posted: "1 day ago",
+        department: "Laboratory",
+        description: "Make a difference in children's lives. Join our dedicated pediatric team.",
+        requirements: ["BSN required", "Pediatric experience preferred", "Active RN license"],
+        benefits: ["Childcare assistance", "Health benefits", "Professional development"],
+        urgent: false,
+        job_url: "https://www.chop.edu/careers"
+      }
+    ];
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
