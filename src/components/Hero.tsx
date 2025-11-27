@@ -7,134 +7,132 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="hero-mesh-bg relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent text-white font-sans"
+      className="relative min-h-[80vh] bg-slate-950 text-white overflow-hidden"
     >
-      {/* Base mesh background */}
-      <div className="hero-mesh-band" />
-      <div className="hero-mesh-wave" />
-      <div className="hero-grid-floor" />
+      {/* Background image + dark overlay (no more hard split) */}
+      <div className="absolute inset-0">
+        {/* Full-width hero image, anchored to the right */}
+        <div
+          className="absolute inset-0 bg-cover bg-[center_right]"
+          style={{ backgroundImage: "url('/images/hero-medical-team.jpg')" }}
+        />
 
-      {/* Soft top highlight / curvature */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/15 via-white/5 to-transparent mix-blend-soft-light opacity-70" />
+        {/* Single gradient overlay to darken left side for text */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/40" />
+      </div>
 
-      {/* Floating glow blobs (parallax-style motion) */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -top-16 -left-10 h-52 w-52 rounded-full bg-blue-400/35 blur-3xl"
-        animate={{ y: [0, 25, 0], x: [0, 10, 0], opacity: [0.5, 0.9, 0.5] }}
-        transition={{
-          duration: 14,
-          repeat: Infinity,
-          repeatType: "mirror",
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute top-24 right-0 h-64 w-64 rounded-full bg-purple-400/30 blur-3xl"
-        animate={{ y: [0, -30, 0], x: [0, -15, 0], opacity: [0.4, 0.85, 0.4] }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          repeatType: "mirror",
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute bottom-10 left-1/3 h-60 w-60 rounded-full bg-orange-400/35 blur-3xl"
-        animate={{ y: [0, 20, 0], opacity: [0.5, 0.9, 0.5] }}
-        transition={{
-          duration: 16,
-          repeat: Infinity,
-          repeatType: "mirror",
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Tiny particles */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10"
-        animate={{ opacity: [0.3, 0.6, 0.3] }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          repeatType: "mirror",
-          ease: "easeInOut",
-        }}
-      >
-        <div className="absolute left-[18%] top-[28%] h-1.5 w-1.5 rounded-full bg-white/70" />
-        <div className="absolute left-[72%] top-[22%] h-1 w-1 rounded-full bg-cyan-200/80" />
-        <div className="absolute left-[60%] top-[40%] h-1 w-1 rounded-full bg-amber-200/80" />
-        <div className="absolute left-[30%] top-[50%] h-1 w-1 rounded-full bg-white/60" />
-        <div className="absolute left-[80%] top-[55%] h-1.5 w-1.5 rounded-full bg-fuchsia-200/75" />
-      </motion.div>
-
-      {/* ===== CONTENT ===== */}
-      <div className="relative z-10 container mx-auto px-6 py-24">
-        <div className="max-w-3xl mx-auto text-center">
-          {/* HEADLINE */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-wide"
-          >
-            IMAGINE A FUTURE WITH
-          </motion.h1>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.15 }}
-            className="mt-4 text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#ffb02e]"
-          >
-            ZERO TRAVELERS
-          </motion.h2>
-
-          {/* PILL */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="mt-6 flex justify-center"
-          >
-            <div className="inline-flex items-center rounded-full bg-[#1c2d82]/90 px-10 py-3 text-xs md:text-sm tracking-[0.18em] uppercase text-slate-100 shadow-[0_16px_35px_rgba(0,0,0,0.75)] border border-white/15 backdrop-blur-[2px]">
-              GLOBAL RECRUITMENT · COST EFFECTIVE SOLUTIONS
-            </div>
-          </motion.div>
-
-          {/* BODY COPY */}
-          <motion.p
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.45 }}
-            className="mt-10 text-base md:text-lg text-slate-100 leading-relaxed"
-          >
-            With almost 2 decades in business, we've saved smart hospitals
-            millions as they transition to their ZERO travelers goal quickly and
-            cost effectively.
-          </motion.p>
-
-          {/* CTA BUTTON */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.6 }}
-            className="mt-10"
-          >
-            <Button
-              size="lg"
-              className="rounded-full bg-[#ff8a1f] px-10 py-5 text-lg font-semibold text-white shadow-[0_18px_45px_rgba(0,0,0,0.75)] hover:bg-[#ff9d3a] hover:shadow-[0_24px_60px_rgba(0,0,0,0.9)] transition-all duration-300"
-              onClick={() =>
-                document
-                  .getElementById("contact")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-6 py-16 lg:py-24">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
+          {/* LEFT COLUMN */}
+          <div className="w-full lg:max-w-[640px]">
+            {/* Top badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 border border-white/10 px-4 py-2 text-xs md:text-sm text-slate-100 mb-8 shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
             >
-              Get Started Today
-            </Button>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              Trusted by 500+ Healthcare Systems
+            </motion.div>
+
+            {/* Main heading */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+              className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight text-slate-50"
+            >
+              Imagine a Future{" "}
+              <span className="block">
+                with{" "}
+                <span className="text-amber-400 font-extrabold">
+                  Zero Travelers
+                </span>
+              </span>
+            </motion.h1>
+
+            {/* Supporting copy */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="mt-6 text-base md:text-lg text-slate-200/90 leading-relaxed"
+            >
+              With almost 2 decades in business, we&apos;ve saved smart
+              hospitals millions as they transition to their ZERO travelers goal
+              quickly and cost effectively.
+            </motion.p>
+
+            {/* Feature chips */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="mt-8 flex flex-wrap gap-3"
+            >
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 border border-slate-700 px-4 py-2 text-sm text-slate-100">
+                <span className="h-5 w-5 rounded-full bg-amber-400/20 flex items-center justify-center text-xs">
+                  🧭
+                </span>
+                Global Recruitment
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 border border-slate-700 px-4 py-2 text-sm text-slate-100">
+                <span className="h-5 w-5 rounded-full bg-emerald-400/20 flex items-center justify-center text-xs">
+                  $
+                </span>
+                Cost Effective
+              </div>
+            </motion.div>
+
+            {/* CTA buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+              className="mt-10 flex flex-wrap items-center gap-4"
+            >
+              <Button
+                size="lg"
+                className="rounded-full bg-amber-500 hover:bg-amber-600 text-white px-8 py-5 text-base font-semibold shadow-[0_18px_45px_rgba(0,0,0,0.8)]"
+                onClick={() =>
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+              >
+                Get Started Today
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* RIGHT COLUMN – STATS CARDS */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="hidden lg:flex flex-col gap-4 ml-auto"
+          >
+            <div className="w-[260px] rounded-2xl bg-slate-900/80 border border-slate-700/80 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md">
+              <p className="text-xs text-slate-400 mb-1">Nurses Placed</p>
+              <p className="text-2xl font-bold text-slate-50">15,000+</p>
+            </div>
+
+            <div className="w-[260px] rounded-2xl bg-slate-900/85 border border-slate-700/80 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md translate-x-6">
+              <p className="text-xs text-slate-400 mb-1">Hospital Partners</p>
+              <p className="text-2xl font-bold text-slate-50">500+</p>
+            </div>
+
+            <div className="w-[260px] rounded-2xl bg-amber-500/90 border border-amber-300/60 px-5 py-4 shadow-[0_24px_70px_rgba(0,0,0,0.9)] backdrop-blur-md translate-x-12">
+              <p className="text-xs text-slate-900/80 mb-1">Cost Reduction</p>
+              <p className="text-2xl font-extrabold text-white">40%</p>
+            </div>
+
+            <div className="w-[260px] rounded-2xl bg-slate-900/85 border border-slate-700/80 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md translate-x-3">
+              <p className="text-xs text-slate-400 mb-1">Client Savings</p>
+              <p className="text-2xl font-bold text-slate-50">$2B+</p>
+            </div>
           </motion.div>
         </div>
       </div>
