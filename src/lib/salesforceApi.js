@@ -1,39 +1,94 @@
-import axios from './axiosInstance';
+import jsforce from "jsforce";
 
-export async function fetchAllSalesforceJobs(language, fetchURL, isServerSide = false) {
-  const baseURL = isServerSide 
-    ? process.env.NEXT_PUBLIC_BASE_URL
-    : '';
-  
-  let allRecords = [];
-  let url = `${baseURL}/api/salesforce/getJobs/${language}/getJobsAccToURL/${encodeURIComponent(fetchURL)}`;
-  let done = false;
-
+export async function salesforceService() {
   try {
-    while (!done) {
-      const response = await axios.get(url);
+        const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_SALESFORCE_LOGIN_URL}/services/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                grant_type: 'client_credentials',
+                client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+                client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+            }),
+        });
 
-      if (response.data.done === false && response.data.nextRecordsUrl) {
-        if (response.data.records && response.data.records.length > 0) {
-          allRecords.push(...response.data.records);
+        if (!tokenResponse.ok) {
+            const errorText = await tokenResponse.text();
+            throw new Error(`Token request failed: ${tokenResponse.status} - ${errorText}`);
         }
-        url = `${baseURL}/api/salesforce/getJobs/${language}/getJobsAccToURL/${encodeURIComponent(response.data.nextRecordsUrl)}`;
-      } else if (response.data.done === true) {
-        allRecords = [...allRecords, ...(response.data.records || [])];
-        done = true;
-      }
+
+        const tokenData = await tokenResponse.json();
+        
+        // Create connection with the obtained access token
+        const conn = new jsforce.Connection({
+            instanceUrl: tokenData.instance_url,
+            accessToken: tokenData.access_token,
+            version: '64.0' // Use appropriate API version
+        });
+        console.log("Salesforce connection established successfully with Client Credentials.");
+        console.log("Instance URL:", conn.instanceUrl);
+        console.log("Access Token:", conn.accessToken);
+        
+        return conn;
+    } catch (error) {
+        console.error("Error connecting to Salesforce with Client Credentials:", error);
+        throw new Error("Failed to connect to Salesforce with Client Credentials");
     }
-
-    return allRecords;
-
-  } catch (error) {
-    console.error('Error fetching jobs:', error);
-    throw error;
-  }
 }
 
-export function buildFetchURL(language, cond = '') {
-  const region = language === "es" ? ".mx" : ".us";
-  const condition = cond ? ` AND (${cond})` : '';
-  return `services/data/v64.0/query?q=SELECT Id, Name, Category__c, Category_For_Job_Posting__c, Regions__c, JMPostalCode__c, Date_Posted__c, Job_Address__c, Industry__c, City__c, State__c, Country__c, Website__c, Emp_Status__c, Emp_Type__c, Hourly_Pay_Range__c, Job_Description__c FROM Job__c WHERE Status__c = 'Open' AND Website__c ='${region}' ${condition}`;
+export async function commonApiCallingMethod(url){
+  try {
+          const conn = await salesforceService();
+          const options = {}
+           const fetchUrl = `${conn.instanceUrl.replace(/\/+$/,'')}/${url.replace(/^\/+/,'')}`;
+            console.log("Calling Salesforce URL:", fetchUrl);
+
+            const response = await fetch(fetchUrl, {
+            headers: {
+                'Authorization': `Bearer ${conn.accessToken}`,
+                'Content-Type': 'application/json'
+            }
+            });
+          // Log status for debugging
+          console.log("Salesforce API status:", response.status, response.statusText);
+
+          const data = await response.json();            // <-- parse the body here
+          console.log("Salesforce raw data:", data);
+
+          return data; 
+      } catch (error) {
+          console.error("Error fetching Salesforce response:", error);
+          console.error("Error Type:", error.name);
+          console.error("Error Code:", error.errorCode);
+          console.error("Error Message:", error.message);
+          
+          // More specific error details
+          if (error.errorCode === 'INVALID_LOGIN') {
+              console.error("🔍 INVALID_LOGIN: Check username/password/security token");
+          }
+          
+          // Log the full error object for debugging
+          console.error("Full Error Object:", JSON.stringify(error, null, 2));
+        
+        // throw new Error(`Salesforce Authentication Failed: ${error.message}`);
+          return { error: true, message: error?.message ?? 'Unknown error' };
+      }
+}
+
+// buildFetchURL - encode the SOQL query portion
+export function buildFetchURL(cond = [], limit = 10, offset = 0) {
+  const condition = cond.length > 0 ? ` AND ${cond}` : '';
+  const condHaveValues = cond.length > 0 ? true : false;
+  const additionalquery = !condHaveValues ? `ORDER BY CreatedDate DESC LIMIT ${limit} OFFSET ${offset}` : '';
+
+  const soql = `SELECT Id, Name, Hospital__r.name, Hospital__r.Id, Scrapper_Url__c, Scrapper_Employement_Type__c, Scrapper_Job_Title__c, Scrapper_Job_Type__c, Scrapper_Location__c, Scrapper_Req_Number__c, Scrapper_Work_Schedule__c, Salary_Range__c, Scrapper_Department__c, Job_Description__c, State__c, City__c, Scrapper_Format_Date__c, CreatedDate FROM Job__c WHERE Scrapper_Url__c != null ${condition} ${additionalquery}`;
+
+  return `services/data/v64.0/query?q=${encodeURIComponent(soql)}`;
+}
+
+export function totalCountQuery() {
+  const soql = `SELECT COUNT() FROM Job__c WHERE Scrapper_Url__c != null`;
+  return `services/data/v64.0/query?q=${encodeURIComponent(soql)}`;
 }

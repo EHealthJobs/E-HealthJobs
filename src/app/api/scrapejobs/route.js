@@ -1,10 +1,9 @@
 'use server';
-
 import { NextResponse } from 'next/server';
-import pool from '../../../lib/db';
+import { buildFetchURL, commonApiCallingMethod, totalCountQuery } from '../../../lib/salesforceApi';
+import { off } from 'process';
 
 export async function GET(req) {
-  const client = await pool.connect();
 
   try {
     const { searchParams } = new URL(req.url);
@@ -18,54 +17,37 @@ export async function GET(req) {
 
     // Build dynamic filters
     let conditions = [];
-    let values = [];
 
     if (search) {
-      values.push(`%${search}%`);
-      conditions.push(`(job_board.title ILIKE $${values.length} OR hospitals.name ILIKE $${values.length})`);
+      conditions.push(`Name LIKE '%${search}%'`);
     }
 
-    if (location && location !== 'all') {
-      values.push(`%${location}%`);
-      conditions.push(`job_board.location ILIKE $${values.length}`);
-    }
+    // if (location && location !== 'all') {
+    //   values.push(`%${location}%`);
+    //   conditions.push(`job_board.location ILIKE $${values.length}`);
+    // }
 
-    if (type && type !== 'all') {
-      values.push(type);
-      conditions.push(`job_board.type = $${values.length}`);
-    }
+    // if (type && type !== 'all') {
+    //   values.push(type);
+    //   conditions.push(`job_board.type = $${values.length}`);
+    // }
 
-    let whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-
-    // Fetch data with pagination
-    const query = `
-      SELECT job_board.*, hospitals.name AS hospital_name
-      FROM job_board
-      JOIN hospitals ON job_board.hospital_id = hospitals.id
-      ${whereClause}
-      ORDER BY job_board.created_at DESC
-      LIMIT ${limit} OFFSET ${offset};
-    `;
-
-    const countQuery = `
-      SELECT COUNT(*) AS total
-      FROM job_board
-      JOIN hospitals ON job_board.hospital_id = hospitals.id
-      ${whereClause};
-    `;
-
-    const [result, countResult] = await Promise.all([
-      client.query(query, values),
-      client.query(countQuery, values),
-    ]);
+    const jobQuery = buildFetchURL(conditions, limit, offset);
+    console.log("Salesforce Job Query:", jobQuery);
+    const salesforceJobsResponse = await commonApiCallingMethod(jobQuery);
+    // console.log("Salesforce Jobs Response:", salesforceJobsResponse);
+    const totalCountQueryStr = totalCountQuery();
+    const totalCountResponse = await commonApiCallingMethod(totalCountQueryStr);
+    const totalRecords = totalCountResponse.totalSize;
+    console.log("Total Salesforce Jobs from count query:", totalRecords);  
 
     return NextResponse.json(
       {
         success: true,
-        jobs: result.rows,
-        total: parseInt(countResult.rows[0].total),
+        jobs: salesforceJobsResponse.records || [],
+        total: totalRecords,
         page,
-        limit,
+        limit
       },
       { status: 200 }
     );
@@ -76,7 +58,5 @@ export async function GET(req) {
       { success: false, message: 'Internal Server Error', error: err.message },
       { status: 500 }
     );
-  } finally {
-    client.release();
   }
 }
