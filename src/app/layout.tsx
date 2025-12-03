@@ -31,8 +31,15 @@ const inter = Inter({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const params = useParams();           // returns { jobId: '...' } in client
-  const jobId = params?.jobId ?? null;
+  const params = useParams();           
+  // normalize param to a single string (or null)
+  function normalizeParam(param: string | string[] | undefined): string | null {
+    if (param === undefined) return null;
+    return Array.isArray(param) ? param[0] ?? null : param;
+  }
+
+  const jobIdRaw = params?.jobId ?? params?.context; // depending on how your route is named; adjust to jobId if folder is [jobId]
+  const jobId = normalizeParam(jobIdRaw);
   const [structuredData, setStructuredData] = useState<any>({
     "@context": "https://schema.org",
     "@graph": [
