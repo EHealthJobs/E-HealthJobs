@@ -34,7 +34,7 @@ const Hero = () => {
               className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 border border-white/10 px-4 py-2 text-xs md:text-sm text-slate-100 mb-8 shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Trusted by 500+ Healthcare Systems
+              Trusted by hospitals and health systems across the U.S.
             </motion.div>
 
             {/* Main heading */}
@@ -82,7 +82,8 @@ const Hero = () => {
                 <span className="h-5 w-5 rounded-full bg-emerald-400/20 flex items-center justify-center text-xs">
                   $
                 </span>
-                Cost Effective
+                {/* Cost Effective Boost Quality Scores */}
+                Cost-Effective Ways to Boost Quality Scores
               </div>
             </motion.div>
 
@@ -115,23 +116,23 @@ const Hero = () => {
             className="hidden lg:flex flex-col gap-4 ml-auto"
           >
             <div className="w-[260px] rounded-2xl bg-slate-900/80 border border-slate-700/80 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md">
-              <p className="text-xs text-slate-400 mb-1">Nurses Placed</p>
-              <p className="text-2xl font-bold text-slate-50">15,000+</p>
+              <p className="text-xs text-slate-400 mb-1">Cost savings per hire</p>
+              <p className="text-slate-50">Save <b>$250k-$350k per RN</b> vs. travelers over 4 years</p>
             </div>
 
             <div className="w-[260px] rounded-2xl bg-slate-900/85 border border-slate-700/80 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md translate-x-6">
-              <p className="text-xs text-slate-400 mb-1">Hospital Partners</p>
-              <p className="text-2xl font-bold text-slate-50">500+</p>
+              <p className="text-xs text-slate-400 mb-1">Long-Term Retention</p>
+              <p className="text-slate-50"><b>4 and 10-year</b> commitment models</p>
             </div>
 
             <div className="w-[260px] rounded-2xl bg-amber-500/90 border border-amber-300/60 px-5 py-4 shadow-[0_24px_70px_rgba(0,0,0,0.9)] backdrop-blur-md translate-x-12">
-              <p className="text-xs text-slate-900/80 mb-1">Cost Reduction</p>
-              <p className="text-2xl font-extrabold text-white">40%</p>
+              <p className="text-xs text-slate-900/80 mb-1">H-1Bs for RNs</p>
+              <p className="font-bold text-white"><b>100% approval rate to date</b> with our immigration partners</p>
             </div>
 
             <div className="w-[260px] rounded-2xl bg-slate-900/85 border border-slate-700/80 px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md translate-x-3">
-              <p className="text-xs text-slate-400 mb-1">Client Savings</p>
-              <p className="text-2xl font-bold text-slate-50">$2B+</p>
+              <p className="text-xs text-slate-400 mb-1">Reduced Upfront Cost</p>
+              <p className="text-slate-50"><b>24+ month</b> payment options available</p>
             </div>
           </motion.div>
         </div>

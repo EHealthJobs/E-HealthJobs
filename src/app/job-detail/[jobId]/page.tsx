@@ -137,6 +137,13 @@ const JobDetailPage = async ({ params }: Props) => {
                             </>
                         )}
 
+                        {job.Scrapper_Work_Schedule__c && (
+                            <>
+                            <div className="font-medium text-slate-600">Work Schedule</div>
+                            <div className="text-slate-900">{job.Scrapper_Work_Schedule__c}</div>
+                            </>
+                        )}
+
                         {job.Scrapper_Req_Number__c && (
                             <>
                             <div className="font-medium text-slate-600">Req Number</div>
