@@ -82,8 +82,13 @@ const Hero = () => {
                 <span className="h-5 w-5 rounded-full bg-emerald-400/20 flex items-center justify-center text-xs">
                   $
                 </span>
-                {/* Cost Effective Boost Quality Scores */}
-                Cost-Effective Ways to Boost Quality Scores
+                Cost Effective
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 border border-slate-700 px-4 py-2 text-sm text-slate-100">
+                <span className="h-5 w-5 rounded-full bg-emerald-400/20 flex items-center justify-center text-xs">
+                  📈
+                </span>
+                Boost Quality Scores
               </div>
             </motion.div>
 
