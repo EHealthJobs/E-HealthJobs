@@ -54,8 +54,7 @@ export async function commonApiCallingMethod(url){
           // Log status for debugging
           console.log("Salesforce API status:", response.status, response.statusText);
 
-          const data = await response.json();            // <-- parse the body here
-          console.log("Salesforce raw data:", data);
+          const data = await response.json();       
 
           return data; 
       } catch (error) {
