@@ -104,7 +104,7 @@ All colors MUST be HSL.
 }
 
 /* Big colorful mesh background */
-.hero-mesh-bg {
+/*.hero-mesh-bg {
   position: relative;
   background-color: #05091a;
   background-image:
@@ -116,9 +116,7 @@ All colors MUST be HSL.
   background-repeat: no-repeat;
   background-size: cover;
 }
-
-/* Glow band behind headline */
-.hero-mesh-band {
+ .hero-mesh-band {
   position: absolute;
   top: 20%;
   left: 50%;
@@ -137,8 +135,7 @@ All colors MUST be HSL.
   z-index: -10;
 }
 
-/* Purple / orange wave under card */
-.hero-mesh-wave {
+ .hero-mesh-wave {
   position: absolute;
   top: 44%;
   left: 50%;
@@ -152,9 +149,8 @@ All colors MUST be HSL.
     radial-gradient(circle at 80% 65%, rgba(249, 115, 22, 0.95), transparent 70%);
   pointer-events: none;
   z-index: -10;
-}
+} 
 
-/* Grid floor at bottom */
 .hero-grid-floor {
   position: absolute;
   inset-inline: 0;
@@ -168,5 +164,5 @@ All colors MUST be HSL.
   opacity: 0.5;
   pointer-events: none;
   z-index: -10;
-}
+} */
 
