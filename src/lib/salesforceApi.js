@@ -1,41 +1,58 @@
 import jsforce from "jsforce";
 
+let cachedConn = null;
+let tokenExpiresAt = 0;
+
 export async function salesforceService() {
+  const now = Date.now();
+
+  // ✅ reuse token if still valid
+  if (cachedConn && tokenExpiresAt > now) {
+    return cachedConn;
+  }
+
   try {
-        const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_SALESFORCE_LOGIN_URL}/services/oauth2/token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                grant_type: 'client_credentials',
-                client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-                client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-            }),
-        });
+    const tokenResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_SALESFORCE_LOGIN_URL}/services/oauth2/token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'client_credentials',
+          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+        }),
+      }
+    );
 
-        if (!tokenResponse.ok) {
-            const errorText = await tokenResponse.text();
-            throw new Error(`Token request failed: ${tokenResponse.status} - ${errorText}`);
-        }
-
-        const tokenData = await tokenResponse.json();
-        
-        // Create connection with the obtained access token
-        const conn = new jsforce.Connection({
-            instanceUrl: tokenData.instance_url,
-            accessToken: tokenData.access_token,
-            version: '64.0' // Use appropriate API version
-        });
-        console.log("Salesforce connection established successfully with Client Credentials.");
-        console.log("Instance URL:", conn.instanceUrl);
-        console.log("Access Token:", conn.accessToken);
-        
-        return conn;
-    } catch (error) {
-        console.error("Error connecting to Salesforce with Client Credentials:", error);
-        throw new Error("Failed to connect to Salesforce with Client Credentials");
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text();
+      throw new Error(`Token request failed: ${tokenResponse.status} - ${errorText}`);
     }
+
+    const tokenData = await tokenResponse.json();
+
+    cachedConn = new jsforce.Connection({
+      instanceUrl: tokenData.instance_url,
+      accessToken: tokenData.access_token,
+      version: '64.0'
+    });
+
+    // Salesforce tokens usually last ~2 hours
+    tokenExpiresAt = now + (tokenData.expires_in ?? 7200) * 1000;
+
+    console.log("✅ Salesforce token cached");
+
+    return cachedConn;
+
+  } catch (error) {
+    cachedConn = null;
+    tokenExpiresAt = 0;
+    console.error("❌ Salesforce auth failed:", error);
+    throw error;
+  }
 }
 
 export async function commonApiCallingMethod(url){
@@ -90,4 +107,23 @@ export function buildFetchURL(cond = [], limit = 10, offset = 0) {
 export function totalCountQuery() {
   const soql = `SELECT COUNT() FROM Job__c WHERE Scrapper_Url__c != null`;
   return `services/data/v64.0/query?q=${encodeURIComponent(soql)}`;
+}
+
+export async function fetchAllSalesforceJobs(initialUrl) {
+  let allRecords = [];
+  let nextUrl = initialUrl;
+
+  while (nextUrl) {
+    const response = await commonApiCallingMethod(nextUrl);
+
+    const records = response?.records || [];
+    allRecords.push(...records);
+
+    // Salesforce pagination cursor
+    nextUrl = response?.nextRecordsUrl
+      ? `${process.env.NEXT_PUBLIC_BASE_URL}${response.nextRecordsUrl}`
+      : null;
+  }
+
+  return allRecords;
 }
