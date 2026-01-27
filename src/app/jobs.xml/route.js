@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { commonApiCallingMethod, buildFetchURL, fetchAllSalesforceJobs } from '../../lib/salesforceApi';
+import { commonApiCallingMethod, buildFetchURLXML, fetchAllSalesforceJobs } from '../../lib/salesforceApi';
 
 
 const JOBS_PER_PAGE = 100;
@@ -8,7 +8,7 @@ const MAX_XML_PAGE_SIZE = 200;
 
 async function getSalesforceJobs(page = 1, limit = JOBS_PER_PAGE, cond = '') {
   try {
-    const fetchURL = buildFetchURL(cond); // NO LIMIT / OFFSET
+    const fetchURL = buildFetchURLXML(cond); // NO LIMIT / OFFSET
 
     const allJobs = await fetchAllSalesforceJobs(fetchURL);
 
@@ -149,6 +149,8 @@ ${paginationInfo}
 
         const country =
             job?.Country__c?.trim() || '';
+        
+        const displayLocation = city && state ? `${city}, ${state}`: job?.Scrapper_Location__c?.trim();    
 
         const payRange =
             job?.Hourly_Pay_Range__c?.trim() || '';
@@ -195,10 +197,8 @@ ${paginationInfo}
             <location>
             ${city ? `<city>${escapeXML(city)}</city>` : ''}
             ${state ? `<state>${escapeXML(state)}</state>` : ''}
-            <country>${escapeXML(country)}</country>
-            ${city && state
-                ? `<display_location>${escapeXML(`${city}, ${state}`)}</display_location>`
-                : ''}
+            ${country && `<country>${escapeXML(country)}</country>`}    
+            <display_location>${escapeXML(displayLocation)}</display_location>
             </location>
 
             <compensation>
@@ -217,7 +217,7 @@ ${paginationInfo}
 
             <job_url>${
             website
-                ? escapeXML(`${website}/openJobs/${jobId}`)
+                ? escapeXML(`${website}/job-detail/${jobId}`)
                 : ''
             }</job_url>
         </job>`;
