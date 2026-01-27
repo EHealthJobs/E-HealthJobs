@@ -177,7 +177,7 @@ ${paginationInfo}
 
         return `    <job>
             <title>${escapeXML(title)}</title>
-            <date_posted>${escapeXML(datePosted)}</date_posted>
+            <date_posted>${escapeXML(String(datePosted))}</date_posted>
             <employment_type>${escapeXML(empType)}</employment_type>
             <employment_status>${escapeXML(empStatus)}</employment_status>
 
