@@ -2,21 +2,15 @@ import { NextResponse } from 'next/server';
 import { commonApiCallingMethod, buildFetchURL, fetchAllSalesforceJobs } from '../../lib/salesforceApi';
 
 
-const JOBS_PER_PAGE = 100; // Adjust based on performance testing
-const MAX_JOBS_PER_FEED = 500; // Maximum jobs in a single feed
+const JOBS_PER_PAGE = 100;
+const MAX_XML_PAGE_SIZE = 200;
 
 
 async function getSalesforceJobs(page = 1, limit = JOBS_PER_PAGE, cond = '') {
   try {
-    console.log(`Fetching Salesforce jobs - Page ${page}`);
+    const fetchURL = buildFetchURL(cond); // NO LIMIT / OFFSET
 
-    // Build initial SOQL URL
-    const fetchURL = buildFetchURL(cond, MAX_JOBS_PER_FEED);
-
-    // 🔑 Fetch ALL records using cursor pagination
     const allJobs = await fetchAllSalesforceJobs(fetchURL);
-
-    console.log(`Total jobs fetched from Salesforce: ${allJobs.length}`);
 
     const totalJobs = allJobs.length;
     const totalPages = Math.ceil(totalJobs / limit);
@@ -29,31 +23,31 @@ async function getSalesforceJobs(page = 1, limit = JOBS_PER_PAGE, cond = '') {
       totalJobs,
       totalPages,
       currentPage: page,
-      hasMore: page < totalPages
+      hasMore: page < totalPages,
+      jobsPerPage: limit
     };
   } catch (error) {
-    console.error('Salesforce fetch failed:', error);
-
     return {
       jobs: [],
       totalJobs: 0,
       totalPages: 0,
       currentPage: 1,
       hasMore: false,
+      jobsPerPage: limit,
       error: error.message
     };
   }
 }
 
-
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const page = parseInt(searchParams.get('page') || '1');
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+
     const limit = Math.min(
-      parseInt(searchParams.get('limit') || JOBS_PER_PAGE),
-      MAX_JOBS_PER_FEED
+      Math.max(1, parseInt(searchParams.get('limit') || JOBS_PER_PAGE)),
+      MAX_XML_PAGE_SIZE
     );
 
     const cond =
@@ -61,17 +55,9 @@ export async function GET(request) {
         ? `Single_job_xml_feed__c='Yes'`
         : '';
 
-    if (page < 1 || limit < 1) {
-      return new NextResponse('Invalid pagination params', { status: 400 });
-    }
-
     const result = await getSalesforceJobs(page, limit, cond);
 
-    if (
-      result.totalJobs > 0 &&
-      result.jobs.length === 0 &&
-      page > result.totalPages
-    ) {
+    if (page > result.totalPages && result.totalJobs > 0) {
       return new NextResponse('Page not found', { status: 404 });
     }
 
@@ -138,66 +124,104 @@ ${paginationInfo}
   // Generate job XML entries
   const jobsXML = jobs.map((job, index) => {
     try {
-      // Handle potential null/undefined values safely with better defaults
-      const title =
-        job?.Scrapper_Job_Title__c ||
-        job?.Name ||
-        'Untitled Job';
-      const datePosted = job?.Scrapper_Format_Date__c || job?.Date_Posted__c;
-      const empType = job?.Scrapper_Employement_Type__c?.trim() || 'Full-time';
-      const empStatus = job?.Emp_Status__c?.trim() || '';
-      const city = job?.City__c?.trim() || '';
-      const state = job?.State__c?.trim() || '';
-      const country = job?.Country__c?.trim() || '';
-      const payRange = job?.Hourly_Pay_Range__c?.trim() || '';
-      const description = job?.Job_Description__c?.trim() || 'Job description not available.';
-      const website = process.env.NEXT_PUBLIC_BASE_URL || '';
-      const jobId = job?.Id || `job-${currentPage}-${index + 1}`;
-      
-      // Additional Salesforce fields you might have
-      const department = job?.Department__c?.trim() || '';
-      const jobFunction = job?.Job_Function__c?.trim() || '';
-      const experienceLevel = job?.Experience_Level__c?.trim() || '';
-      const remote = job?.Remote_Work__c || false;
-      
-      return `    <job>
-        <title>${escapeXML(title)}</title>
-        <date_posted>${datePosted}</date_posted>
-        <employment_type>${empType}</employment_type>
-        <employment_status>${escapeXML(empStatus)}</employment_status>
-        ${department ? `<department>${escapeXML(department)}</department>` : ''}
-        ${jobFunction ? `<job_function>${escapeXML(jobFunction)}</job_function>` : ''}
-        ${experienceLevel ? `<experience_level>${escapeXML(experienceLevel)}</experience_level>` : ''}
-        <remote_work>${remote}</remote_work>
-        
-        <company>
+        // Handle potential null/undefined values safely with better defaults
+        const title =
+            job?.Scrapper_Job_Title__c ||
+            job?.Name ||
+            'Untitled Job';
+
+        const datePosted =
+            job?.Scrapper_Format_Date__c ||
+            job?.Date_Posted__c ||
+            '';
+
+        const empType =
+            job?.Scrapper_Employement_Type__c?.trim() || 'Full-time';
+
+        const empStatus =
+            job?.Emp_Status__c?.trim() || '';
+
+        const city =
+            job?.City__c?.trim() || '';
+
+        const state =
+            job?.State__c?.trim() || '';
+
+        const country =
+            job?.Country__c?.trim() || '';
+
+        const payRange =
+            job?.Hourly_Pay_Range__c?.trim() || '';
+
+        const description =
+            job?.Job_Description__c?.trim() || 'Job description not available.';
+
+        const website =
+            process.env.NEXT_PUBLIC_BASE_URL || '';
+
+        const jobId =
+            job?.Id || `job-${currentPage}-${index + 1}`;
+
+        // Additional Salesforce fields
+        const department =
+            job?.Department__c?.trim() || '';
+
+        const jobFunction =
+            job?.Job_Function__c?.trim() || '';
+
+        const experienceLevel =
+            job?.Experience_Level__c?.trim() || '';
+
+        const remote =
+            Boolean(job?.Remote_Work__c);
+
+        return `    <job>
+            <title>${escapeXML(title)}</title>
+            <date_posted>${escapeXML(String(datePosted))}</date_posted>
+            <employment_type>${escapeXML(empType)}</employment_type>
+            <employment_status>${escapeXML(empStatus)}</employment_status>
+
+            ${department ? `<department>${escapeXML(department)}</department>` : ''}
+            ${jobFunction ? `<job_function>${escapeXML(jobFunction)}</job_function>` : ''}
+            ${experienceLevel ? `<experience_level>${escapeXML(experienceLevel)}</experience_level>` : ''}
+
+            <remote_work>${remote}</remote_work>
+
+            <company>
             <n>${escapeXML(publisher)}</n>
-            ${website ? `<website>${website}</website>` : ''}
-        </company>
-        
-        <location>
+            ${website ? `<website>${escapeXML(website)}</website>` : ''}
+            </company>
+
+            <location>
             ${city ? `<city>${escapeXML(city)}</city>` : ''}
             ${state ? `<state>${escapeXML(state)}</state>` : ''}
-            <country>${country}</country>
-            ${city && state ? `<display_location>${escapeXML(city)}, ${state}</display_location>` : ''}
-        </location>
-        
-        <compensation>
+            <country>${escapeXML(country)}</country>
+            ${city && state
+                ? `<display_location>${escapeXML(`${city}, ${state}`)}</display_location>`
+                : ''}
+            </location>
+
+            <compensation>
             ${payRange ? `<pay_range>${escapeXML(payRange)}</pay_range>` : ''}
             <currency>USD</currency>
-        </compensation>
-        
-        <description><![CDATA[${description}]]></description>
-        
-        <metadata>
-            <job_id>${jobId}</job_id>
+            </compensation>
+
+            <description><![CDATA[${description}]]></description>
+
+            <metadata>
+            <job_id>${escapeXML(jobId)}</job_id>
             <source>E-HealthJOBS</source>
             <page_number>${currentPage}</page_number>
             <position_in_page>${index + 1}</position_in_page>
-        </metadata>
-        <job_url>${website ? `${website}/openJobs/${jobId}` : ''}</job_url>
-    </job>`;
-    } catch (jobError) {
+            </metadata>
+
+            <job_url>${
+            website
+                ? escapeXML(`${website}/openJobs/${jobId}`)
+                : ''
+            }</job_url>
+        </job>`;
+    }catch (jobError) {
       console.error(`Error processing job at index ${index}:`, jobError);
       return `    <!-- Error processing job at index ${index}: ${jobError.message} -->`;
     }
