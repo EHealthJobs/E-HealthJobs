@@ -99,7 +99,7 @@ export function buildFetchURL(cond = [], limit = 10, offset = 0) {
   const condHaveValues = cond.length > 0 ? true : false;
   const additionalquery = !condHaveValues ? `ORDER BY CreatedDate DESC LIMIT ${limit} OFFSET ${offset}` : '';
 
-  const soql = `SELECT Id, Name, Hospital__r.name, Hospital__r.Id, Scrapper_Url__c, Scrapper_Employement_Type__c, Scrapper_Job_Title__c, Scrapper_Job_Type__c, Scrapper_Location__c, Scrapper_Req_Number__c, Scrapper_Work_Schedule__c, Salary_Range__c, Scrapper_Department__c, Job_Description__c, State__c, City__c, Scrapper_Format_Date__c, CreatedDate FROM Job__c WHERE Scrapper_Url__c != null ${condition} ${additionalquery}`;
+  const soql = `SELECT Id, Name, Hospital__r.name, Hospital__r.Id, Scrapper_Url__c, Scrapper_Employement_Type__c, Scrapper_Job_Title__c, Scrapper_Job_Type__c, Scrapper_Location__c, Scrapper_Req_Number__c, Scrapper_Work_Schedule__c, Salary_Range__c, Scrapper_Department__c, Job_Description__c, State__c, City__c, Scrapper_Format_Date__c, Date_Posted__c, CreatedDate FROM Job__c WHERE Scrapper_Url__c != null ${condition} ${additionalquery}`;
 
   return `services/data/v64.0/query?q=${encodeURIComponent(soql)}`;
 }

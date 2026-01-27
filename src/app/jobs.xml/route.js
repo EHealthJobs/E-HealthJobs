@@ -143,7 +143,7 @@ ${paginationInfo}
         job?.Scrapper_Job_Title__c ||
         job?.Name ||
         'Untitled Job';
-      const datePosted = job?.Date_Posted__c || new Date().toISOString().split('T')[0];
+      const datePosted = job?.Scrapper_Format_Date__c || job?.Date_Posted__c;
       const empType = job?.Scrapper_Employement_Type__c?.trim() || 'Full-time';
       const empStatus = job?.Emp_Status__c?.trim() || '';
       const city = job?.City__c?.trim() || '';
