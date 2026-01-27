@@ -95,18 +95,30 @@ export async function commonApiCallingMethod(url){
 
 // buildFetchURL - encode the SOQL query portion
 export function buildFetchURL(cond = [], limit = 10, offset = 0) {
-  const condition = cond.length > 0 ? ` AND ${cond}` : '';
-  const condHaveValues = cond.length > 0 ? true : false;
-  const additionalquery = !condHaveValues ? `ORDER BY CreatedDate DESC LIMIT ${limit} OFFSET ${offset}` : '';
+  const condition = cond && cond.length > 0 ? ` AND ${cond}` : '';
+   /**
+   * IMPORTANT:
+   * - OFFSET pagination breaks large Salesforce datasets
+   * - For XML feeds we want ALL records → no LIMIT/OFFSET
+   * - LIMIT/OFFSET is allowed only when offset > 0
+   */
+  let paginationClause = '';
 
-  const soql = `SELECT Id, Name, Hospital__r.name, Hospital__r.Id, Scrapper_Url__c, Scrapper_Employement_Type__c, Scrapper_Job_Title__c, Scrapper_Job_Type__c, Scrapper_Location__c, Scrapper_Req_Number__c, Scrapper_Work_Schedule__c, Salary_Range__c, Scrapper_Department__c, Job_Description__c, State__c, City__c, Scrapper_Format_Date__c, Date_Posted__c, CreatedDate FROM Job__c WHERE Scrapper_Url__c != null ${condition} ${additionalquery}`;
+  if (offset > 0) {
+    paginationClause = ` ORDER BY CreatedDate DESC LIMIT ${limit} OFFSET ${offset}`;
+  } else {
+    paginationClause = ` ORDER BY CreatedDate DESC`;
+  }
 
-  return `services/data/v64.0/query?q=${encodeURIComponent(soql)}`;
+
+  const soql = `SELECT Id, Name, Hospital__r.name, Hospital__r.Id, Scrapper_Url__c, Scrapper_Employement_Type__c, Scrapper_Job_Title__c, Scrapper_Job_Type__c, Scrapper_Location__c, Scrapper_Req_Number__c, Scrapper_Work_Schedule__c, Salary_Range__c, Scrapper_Department__c, Job_Description__c, State__c, City__c, Scrapper_Format_Date__c, Date_Posted__c, CreatedDate FROM Job__c WHERE Scrapper_Url__c != null ${condition} ${paginationClause}`;
+
+  return `services/data/v65.0/query?q=${encodeURIComponent(soql)}`;
 }
 
 export function totalCountQuery() {
   const soql = `SELECT COUNT() FROM Job__c WHERE Scrapper_Url__c != null`;
-  return `services/data/v64.0/query?q=${encodeURIComponent(soql)}`;
+  return `services/data/v65.0/query?q=${encodeURIComponent(soql)}`;
 }
 
 export async function fetchAllSalesforceJobs(initialUrl) {
@@ -120,9 +132,7 @@ export async function fetchAllSalesforceJobs(initialUrl) {
     allRecords.push(...records);
 
     // Salesforce pagination cursor
-    nextUrl = response?.nextRecordsUrl
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}${response.nextRecordsUrl}`
-      : null;
+    nextUrl = response?.nextRecordsUrl || null;
   }
 
   return allRecords;
