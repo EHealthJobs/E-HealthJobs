@@ -1,7 +1,6 @@
 'use server';
 import { NextResponse } from 'next/server';
 import { buildFetchURL, commonApiCallingMethod, totalCountQuery } from '../../../lib/salesforceApi';
-import { off } from 'process';
 
 export async function GET(req) {
 
@@ -41,6 +40,7 @@ export async function GET(req) {
     const totalRecords = totalCountResponse.totalSize;
     console.log("Total Salesforce Jobs from count query:", totalRecords);  
 
+    // ✅ Add CORS headers
     return NextResponse.json(
       {
         success: true,
@@ -49,14 +49,41 @@ export async function GET(req) {
         page,
         limit
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        }
+      }
     );
 
   } catch (err) {
     console.error('GET /api/jobs error:', err);
     return NextResponse.json(
       { success: false, message: 'Internal Server Error', error: err.message },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        }
+      }
     );
   }
+}
+
+// ✅ Handle OPTIONS preflight
+export async function OPTIONS(req) {
+  return NextResponse.json(
+    {},
+    {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    }
+  );
 }
