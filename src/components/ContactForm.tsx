@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const ContactForm = () => {
     email: "",
     phone: "",
     agreeToTexts: false,
+    agreeToPrivacyAndTerms: false,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,6 +30,7 @@ const ContactForm = () => {
       email: "",
       phone: "",
       agreeToTexts: false,
+      agreeToPrivacyAndTerms: false,
     });
   };
 
@@ -114,6 +117,38 @@ const ContactForm = () => {
                     I agree to receiving appointment reminders by text. E-Health Jobs will not share 
                     your phone number with other parties. Message frequency will vary. Msg & data rates 
                     may apply. Reply HELP for help or STOP to cancel.
+                  </label>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="agreeToprivacyandterms"
+                    checked={formData.agreeToPrivacyAndTerms}
+                    onCheckedChange={(checked) => 
+                      setFormData({ ...formData, agreeToPrivacyAndTerms: checked as boolean })
+                    }
+                  />
+                  <label
+                    htmlFor="agreeToprivacyandterms"
+                    className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
+                  >
+                    I agree to the{" "}
+                    <Link
+                      href="/privacy-policy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-blue-600"
+                    >
+                      Privacy Policy
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/terms-of-service"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-blue-600"
+                    >
+                      Terms of Service
+                    </Link>.
                   </label>
                 </div>
 
