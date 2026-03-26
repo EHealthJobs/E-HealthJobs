@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Privacy Policy | E-Health Jobs",
+  title: "PRIVACY POLICY | E-Health Jobs",
   robots: "noindex, nofollow",
 };
 
@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
         {/* ── Hero ── */}
         <div className="pp-hero">
           <div className="pp-hero-inner">
-            <h1 className="pp-hero-title">Privacy Policy</h1>
+            <h1 className="pp-hero-title">PRIVACY POLICY</h1>
             <p className="pp-hero-sub">Contact Form · E-Health Jobs Inc.</p>
             <span className="pp-hero-badge">Last updated: March 19, 2026</span>
           </div>
