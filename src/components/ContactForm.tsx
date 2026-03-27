@@ -8,30 +8,100 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import Link from "next/link";
+import axiosInstance from "../lib/axiosInstance";
+import { useRouter } from "next/navigation";
+
+
+const initialFormData = {
+  FirstName: "",
+  LastName: "",
+  companyName: "",
+  Email: "",
+  phone: "",
+  agreeReceivingAppointmentReminder: false,
+  privacyPolicy: false,
+};
 
 const ContactForm = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(initialFormData);
+  const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
     companyName: "",
     email: "",
     phone: "",
-    agreeToTexts: false,
-    agreeToPrivacyAndTerms: false,
+    privacyPolicy: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter();
+
+  const validateForm = () => {
+    const nextErrors = {
+      firstName: formData.FirstName.trim() ? "" : "First name is required.",
+      lastName: formData.LastName.trim() ? "" : "Last name is required.",
+      companyName: formData.companyName.trim() ? "" : "Company name is required.",
+      email: formData.Email.trim() ? "" : "Email is required.",
+      phone: formData.phone.trim() ? "" : "Phone is required.",
+      privacyPolicy: formData.privacyPolicy
+        ? ""
+        : "You must agree to the Privacy Policy and Terms of Service.",
+    };
+
+    setErrors(nextErrors);
+
+    return Object.values(nextErrors).every((value) => !value);
+  };
+
+  const clearFieldError = (field: keyof typeof errors) => {
+    if (errors[field]) {
+      setErrors((currentErrors) => ({ ...currentErrors, [field]: "" }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thank you! We'll contact you soon.");
-    setFormData({
+
+    if (!validateForm()) {
+      return;
+    }
+
+    // toast.success("Thank you! We'll contact you soon.");
+    setFormData(initialFormData);
+    
+    setErrors({
       firstName: "",
       lastName: "",
       companyName: "",
       email: "",
       phone: "",
-      agreeToTexts: false,
-      agreeToPrivacyAndTerms: false,
+      privacyPolicy: "",
     });
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/contactForm",
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      console.log('Form submit response:', response);
+
+      if (response.data.success || response.data.result?.success) {
+          // toast.success('Form submitted successfully!');
+          toast.success("Thank you! We'll contact you soon.");
+          setTimeout(() => {
+              router.push('/');
+          }, 100);
+      } else {
+        toast.error(response.data.message || 'Form submission failed.');
+      }
+    } catch (err) {
+      console.error('Form submit error:', err);
+      toast.error('An error occurred. Try again.');
+    }
   };
 
   return (
@@ -51,63 +121,103 @@ const ContactForm = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First name</Label>
+                    <Label htmlFor="firstName">
+                      First name <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="firstName"
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      required
+                      value={formData.FirstName}
+                      onChange={(e) => {
+                        setFormData({ ...formData, FirstName: e.target.value });
+                        clearFieldError("firstName");
+                      }}
+                      aria-invalid={Boolean(errors.firstName)}
                     />
+                    {errors.firstName && (
+                      <p className="text-sm text-destructive">{errors.firstName}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last name</Label>
+                    <Label htmlFor="lastName">
+                      Last name <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="lastName"
-                      value={formData.lastName}
-                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      required
+                      value={formData.LastName}
+                      onChange={(e) => {
+                        setFormData({ ...formData, LastName: e.target.value });
+                        clearFieldError("lastName");
+                      }}
+                      aria-invalid={Boolean(errors.lastName)}
                     />
+                    {errors.lastName && (
+                      <p className="text-sm text-destructive">{errors.lastName}</p>
+                    )}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="companyName">Company name</Label>
+                  <Label htmlFor="companyName">
+                    Company name <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="companyName"
                     value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    required
+                    onChange={(e) => {
+                      setFormData({ ...formData, companyName: e.target.value });
+                      clearFieldError("companyName");
+                    }}
+                    aria-invalid={Boolean(errors.companyName)}
                   />
+                  {errors.companyName && (
+                    <p className="text-sm text-destructive">{errors.companyName}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">
+                    Email <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="email"
                     type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
+                    value={formData.Email}
+                    onChange={(e) => {
+                      setFormData({ ...formData, Email: e.target.value });
+                      clearFieldError("email");
+                    }}
+                    aria-invalid={Boolean(errors.email)}
                   />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">
+                    Phone <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    required
+                    onChange={(e) => {
+                      setFormData({ ...formData, phone: e.target.value });
+                      clearFieldError("phone");
+                    }}
+                    aria-invalid={Boolean(errors.phone)}
                   />
+                  {errors.phone && (
+                    <p className="text-sm text-destructive">{errors.phone}</p>
+                  )}
                 </div>
 
                 <div className="flex items-start space-x-2">
                   <Checkbox
                     id="agreeToTexts"
-                    checked={formData.agreeToTexts}
+                    checked={formData.agreeReceivingAppointmentReminder}
                     onCheckedChange={(checked) => 
-                      setFormData({ ...formData, agreeToTexts: checked as boolean })
+                      setFormData({ ...formData, agreeReceivingAppointmentReminder: checked as boolean })
                     }
                   />
                   <label
@@ -122,10 +232,14 @@ const ContactForm = () => {
                 <div className="flex items-start space-x-2">
                   <Checkbox
                     id="agreeToprivacyandterms"
-                    checked={formData.agreeToPrivacyAndTerms}
-                    onCheckedChange={(checked) => 
-                      setFormData({ ...formData, agreeToPrivacyAndTerms: checked as boolean })
-                    }
+                    checked={formData.privacyPolicy}
+                    onCheckedChange={(checked) => {
+                      const isChecked = checked as boolean;
+                      setFormData({ ...formData, privacyPolicy: isChecked });
+                      if (isChecked) {
+                        clearFieldError("privacyPolicy");
+                      }
+                    }}
                   />
                   <label
                     htmlFor="agreeToprivacyandterms"
@@ -151,6 +265,9 @@ const ContactForm = () => {
                     </Link>.
                   </label>
                 </div>
+                {errors.privacyPolicy && (
+                  <p className="text-sm text-destructive">{errors.privacyPolicy}</p>
+                )}
 
                 <Button 
                   type="submit" 

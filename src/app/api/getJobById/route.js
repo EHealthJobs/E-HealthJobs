@@ -1,4 +1,3 @@
-// src/app/api/getJobById/route.js
 import { NextResponse } from "next/server";
 import { buildFetchURL, commonApiCallingMethod } from '../../../lib/salesforceApi';
 

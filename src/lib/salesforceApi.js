@@ -147,3 +147,23 @@ export async function fetchAllSalesforceJobs(initialUrl) {
 
   return allRecords;
 }
+
+export async function createContact(url, body) {
+  try {
+    const conn = await salesforceService();
+    const response = await fetch(`${conn.instanceUrl}/${url}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${conn.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Salesforce request error:", error);
+    throw error; // Let the caller handle the error
+  }
+}
