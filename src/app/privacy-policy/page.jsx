@@ -69,8 +69,8 @@ export default function PrivacyPolicyPage() {
                 submit.
               </p>
               <p>
-                Our website is hosted on the Wix.com platform. Like most web hosting
-                services, Wix may automatically log basic technical data such as IP
+                Our website is hosted on Amazon Web Services (AWS). Like most web hosting
+                services, AWS may automatically log basic technical data such as IP
                 addresses and browser information as part of standard server
                 operations. We do not directly collect or analyze this data for
                 marketing purposes.
@@ -179,11 +179,11 @@ export default function PrivacyPolicyPage() {
               <p>
                 We take reasonable measures to protect your personal information,
                 including your mobile number, from unauthorized access, disclosure, or
-                misuse. Our company is hosted on the Wix.com platform. Wix.com
-                provides us with the online platform that allows us to sell our
-                services to you. Your data may be stored through Wix.com&apos;s data
-                storage, databases and the general Wix.com applications. They store
-                your data on secure servers behind a firewall.
+                misuse. Our website is hosted on Amazon Web Services (AWS). AWS
+                provides us with the cloud infrastructure that allows us to deliver our
+                services to you. Your data may be stored through AWS&apos;s data
+                storage, databases and cloud applications. They store
+                your data on secure servers with industry-standard security controls.
               </p>
             </Section>
 
