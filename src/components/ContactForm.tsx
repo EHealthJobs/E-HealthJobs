@@ -32,6 +32,7 @@ const ContactForm = () => {
     phone: "",
     privacyPolicy: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
 
@@ -61,9 +62,15 @@ const ContactForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
+
+    setIsSubmitting(true);
 
     // toast.success("Thank you! We'll contact you soon.");
     setFormData(initialFormData);
@@ -97,10 +104,14 @@ const ContactForm = () => {
           }, 100);
       } else {
         toast.error(response.data.message || 'Form submission failed.');
+        setIsSubmitting(false);
       }
     } catch (err) {
-      console.error('Form submit error:', err);
-      toast.error('An error occurred. Try again.');
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      const message = error.response?.data?.message || error.message || 'An error occurred. Try again.';
+      console.warn('Form submit error:', message);
+      toast.error(message);
+      setIsSubmitting(false);
     }
   };
 
@@ -271,10 +282,11 @@ const ContactForm = () => {
 
                 <Button 
                   type="submit" 
+                  disabled={isSubmitting}
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6"
                   size="lg"
                 >
-                  Submit
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
               </form>
             </CardContent>

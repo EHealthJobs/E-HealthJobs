@@ -1,17 +1,62 @@
 import { NextResponse } from "next/server";
 import { createContact } from '../../../lib/salesforceApi';
+import pool from "../../../lib/db";
+import bcrypt from 'bcrypt';
 
 
 export async function POST(req) {
   try {
     const rawData = {};
     let attachmentFile = null;
+    const form = await req.formData();
+    const email = form.get("Email");
     const contentType = req.headers.get("content-type") || "";
+
+    const client = await pool.connect();
+
+      console.log("email-0>",email);  
+      const check = await client.query('SELECT id FROM users WHERE email = $1', [email]);
+
+      console.log("check-0>",check);
+      
+      if (check.rows.length > 0) {
+        return NextResponse.json(
+          { success: false, message: 'Email already exists. Please log in with your existing account.' },
+          { status: 400 }
+        );
+      }
+
+      // const hashedPassword = await bcrypt.hash(password, 10);
+
+      // const query = `
+      //   INSERT INTO users (
+      //     first_name, last_name, email, phone_number, whatsapp_number, password,
+      //     citizenship, resume_url, have_you_ever_worked_in_healthcare, are_you_a_student_in_a_health_degree
+      //   )
+      //   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      //   RETURNING id
+      // `;
+
+      // const values = [
+      //   firstName,
+      //   lastName,
+      //   email,
+      //   phone_number,
+      //   whatsApp_number,
+      //   hashedPassword,
+      //   citizenship,
+      //  "trry",
+      //  "yes","no"
+      // ];
+
+      // const results = await client.query(query, values);
+      // const userId = result.rows[0].id;
+
+
 
     if (contentType.includes("application/json")) {
       Object.assign(rawData, await req.json());
     } else {
-      const form = await req.formData();
 
       for (const [key, value] of form.entries()) {
         if (key === "Attachment") {
