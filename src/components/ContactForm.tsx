@@ -270,8 +270,8 @@ const ContactForm = () => {
                   Consent is not a condition of purchase. Message & data rates may apply. Message frequency varies. Unsubscribe by 
                   replying STOP. Reply HELP for help or contact us at <a href="tel:+16465030970" className="underline text-blue-600">
                       +1 646-503-0970
-                    </a> or email us at <a href="mailto:admin@e-healthjobs" className="underline text-blue-600">
-                      admin@e-healthjobs
+                    </a> or email us at <a href="mailto:admin@e-healthglobal.us" className="underline text-blue-600">
+                      admin@e-healthglobal.us
                     </a>. Phone numbers aren't 
                   shared with third parties.{" "}
                     <Link
