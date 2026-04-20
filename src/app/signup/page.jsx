@@ -52,10 +52,21 @@ export default function SignUp() {
         nextErrors[field.key] = `${field.label} is required`;
       } else if (field.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData[field.key])) {
         nextErrors[field.key] = "Please enter a valid email address";
+      } else if (field.key === "Password" && formData[field.key].length < 8) {
+        nextErrors[field.key] = "Password must be at least 8 characters";
       } else if (field.type === "tel" && !/^[\d\s\+\-\(\)]{7,}$/.test(formData[field.key])) {
         nextErrors[field.key] = "Please enter a valid phone number";
       }
     });
+
+    if (
+      stepConfig.fields.some(field => field.key === "ConfirmPassword") &&
+      formData.Password &&
+      formData.ConfirmPassword &&
+      formData.Password !== formData.ConfirmPassword
+    ) {
+      nextErrors.ConfirmPassword = "Passwords do not match";
+    }
 
     return nextErrors;
   };
@@ -71,7 +82,7 @@ export default function SignUp() {
 
   const handleNext = async () => {
     setSubmitAttempted(true);
-    const nextData = dataWithFieldDefaults(data);
+      const nextData = dataWithFieldDefaults(data);
     setData(nextData);
     console.log("Validating step:", step.id, nextData);
     const stepErrors = validateStep(step, nextData);
@@ -93,7 +104,7 @@ export default function SignUp() {
       try {
         const response = await axiosInstance.post(
           "/api/contactForm",
-          nextData,
+          { ...nextData, submissionType: "signup" },
           {
             headers: {
               'Content-Type': 'multipart/form-data',

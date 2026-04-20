@@ -3,56 +3,46 @@ import { createContact } from '../../../lib/salesforceApi';
 import pool from "../../../lib/db";
 import bcrypt from 'bcrypt';
 
+const getSalesforceContactId = (result) => {
+  return (
+    result?.contactId || null
+  );
+};
 
 export async function POST(req) {
+  let client;
+
   try {
     const rawData = {};
     let attachmentFile = null;
     const form = await req.formData();
-    const email = form.get("Email");
     const contentType = req.headers.get("content-type") || "";
 
-    const client = await pool.connect();
+    const firstName = form.get("FirstName");
+    const lastName = form.get("LastName");
+    const email = form.get("Email");
+    const phone_number = form.get("Phone") || form.get("PhoneNumber") || form.get("phone");
+    const whatsApp_number = `${form.get("countryCode") || ""}${form.get("WhatsAppNumber") || ""}`;
+    const password = form.get("Password");
+    const submissionType = form.get("submissionType");
+    const isSignupSubmission =
+      submissionType === "signup" ||
+      form.has("ConfirmPassword") ||
+      form.has("Attachment");
 
-      console.log("email-0>",email);  
-      const check = await client.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (!email) {
+      return NextResponse.json(
+        { success: false, message: 'Email address is required.' },
+        { status: 400 }
+      );
+    }
 
-      console.log("check-0>",check);
-      
-      if (check.rows.length > 0) {
-        return NextResponse.json(
-          { success: false, message: 'Email already exists. Please log in with your existing account.' },
-          { status: 400 }
-        );
-      }
-
-      // const hashedPassword = await bcrypt.hash(password, 10);
-
-      // const query = `
-      //   INSERT INTO users (
-      //     first_name, last_name, email, phone_number, whatsapp_number, password,
-      //     citizenship, resume_url, have_you_ever_worked_in_healthcare, are_you_a_student_in_a_health_degree
-      //   )
-      //   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-      //   RETURNING id
-      // `;
-
-      // const values = [
-      //   firstName,
-      //   lastName,
-      //   email,
-      //   phone_number,
-      //   whatsApp_number,
-      //   hashedPassword,
-      //   citizenship,
-      //  "trry",
-      //  "yes","no"
-      // ];
-
-      // const results = await client.query(query, values);
-      // const userId = result.rows[0].id;
-
-
+    if (isSignupSubmission && !password) {
+      return NextResponse.json(
+        { success: false, message: 'Password is required.' },
+        { status: 400 }
+      );
+    }
 
     if (contentType.includes("application/json")) {
       Object.assign(rawData, await req.json());
@@ -69,6 +59,23 @@ export async function POST(req) {
         } else {
           rawData[key] = value;
         }
+      }
+    }
+
+    delete rawData.Password;
+    delete rawData.ConfirmPassword;
+    delete rawData.submissionType;
+
+    if (isSignupSubmission) {
+      client = await pool.connect();
+
+      const checkUserExists = await client.query('SELECT id FROM users WHERE email = $1', [email]);
+
+      if (checkUserExists.rows.length > 0) {
+        return NextResponse.json(
+          { success: false, message: 'Email already exists. Please log in with your existing account.' },
+          { status: 400 }
+        );
       }
     }
 
@@ -153,11 +160,61 @@ export async function POST(req) {
     }
 
     const result = await createContact(`services/apexrest/eHealthJobsContactUsApi`, rawData);
+    console.log('Salesforce API result:', result);
+    const contactId = getSalesforceContactId(result);
+
+    if (result?.success === false || (isSignupSubmission && !contactId)) {
+      return NextResponse.json({
+        success: false,
+        message: result?.message || 'Salesforce contact creation failed.',
+        result,
+      }, { status: 400 });
+    }
+
+    if (!isSignupSubmission) {
+      return NextResponse.json({
+        success: result?.success ?? true,
+        contactId,
+        result,
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(String(password), 10);
+
+    const query = `
+      INSERT INTO users (
+        first_name, last_name, email, phone_number, whatsapp_number, password, contact_sfid
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7)
+      RETURNING id
+    `;
+
+    const values = [
+      firstName,
+      lastName,
+      email,
+      phone_number,
+      whatsApp_number,
+      hashedPassword,
+      contactId
+    ];
+
+    const results = await client.query(query, values);
+
     return NextResponse.json({
       success: result?.success ?? true,
+      userId: results.rows[0].id,
+      contactId,
       result,
     });
   } catch (err) {
+    if (err?.code === '23505') {
+      return NextResponse.json(
+        { success: false, message: 'Email already exists. Please log in with your existing account.' },
+        { status: 400 }
+      );
+    }
+
     console.error('Error in API route:', err);
     console.log('Error in API route:', err);
     return NextResponse.json({ 
@@ -165,5 +222,7 @@ export async function POST(req) {
       message: 'Server error occurred', 
       error: err?.message 
     }, { status: 500 });
+  } finally {
+    client?.release();
   }
 }

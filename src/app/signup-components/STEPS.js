@@ -62,6 +62,8 @@ const STEPS = [
       { key: "countryCode",           label: "Country Code",                      type: "hidden",    value: "(+1)",                    required: false },
       { key: "WhatsAppNumber",    label: "WhatsApp Number",                   type: "tel",    placeholder: "+1 (555) 000-0000",     required: false },
       { key: "Email",                 label: "Email Address",                     type: "email",  placeholder: "john@example.com",      required: true },
+      { key: "Password",              label: "Password",                          type: "password", placeholder: "Enter password",       required: true },
+      { key: "ConfirmPassword",       label: "Confirm Password",                  type: "password", placeholder: "Confirm password",     required: true },
       { key: "City",               label: "City",                              type: "text",   placeholder: "New York",              required: true },
       { key: "State",              label: "State / Province",                  type: "text",   placeholder: "NY",                    required: true },
       { key: "MailingCountryText", label: "Country",                           type: "text",   placeholder: "US",                    required: true },

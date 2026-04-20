@@ -42,7 +42,7 @@ const ContactForm = () => {
       lastName: formData.LastName.trim() ? "" : "Last name is required.",
       companyName: formData.companyName.trim() ? "" : "Company name is required.",
       email: formData.Email.trim() ? "" : "Email is required.",
-      phone: formData.phone.trim() ? "" : "Phone is required.",
+      phone: "",
       privacyPolicy: formData.privacyPolicy
         ? ""
         : "You must agree to the Privacy Policy and Terms of Service.",
@@ -99,6 +99,7 @@ const ContactForm = () => {
       if (response.data.success || response.data.result?.success) {
           // toast.success('Form submitted successfully!');
           toast.success("Thank you! We'll contact you soon.");
+          setIsSubmitting(false);
           setTimeout(() => {
               router.push('/');
           }, 100);
@@ -206,7 +207,7 @@ const ContactForm = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">
-                    Phone <span className="text-destructive">*</span>
+                    Phone {/*<span className="text-destructive">*</span>*/}
                   </Label>
                   <Input
                     id="phone"
@@ -223,7 +224,7 @@ const ContactForm = () => {
                   )}
                 </div>
 
-                <div className="flex items-start space-x-2">
+                {/* <div className="flex items-start space-x-2">
                   <Checkbox
                     id="agreeToTexts"
                     checked={formData.agreeReceivingAppointmentReminder}
@@ -237,26 +238,42 @@ const ContactForm = () => {
                   >
                     I agree to receiving appointment reminders by text. E-Health Jobs will not share 
                     your phone number with other parties. Message frequency will vary. Msg & data rates 
-                    may apply. Reply HELP for help or STOP to cancel.
+                    may apply. Reply HELP for help or STOP to cancel. Contact us at{" "}
+                    <a href="mailto:admin@e-healthglobal.us" className="underline text-blue-600">
+                      admin@e-healthglobal.us
+                    </a>{" "}
+                    or{" "}
+                    <a href="tel:+16465030970" className="underline text-blue-600">
+                      +1 646-503-0970
+                    </a>
+                    .
                   </label>
-                </div>
+                </div> */}
                 <div className="flex items-start space-x-2">
-                  <Checkbox
+                  <input
                     id="agreeToprivacyandterms"
+                    type="checkbox"
                     checked={formData.privacyPolicy}
-                    onCheckedChange={(checked) => {
-                      const isChecked = checked as boolean;
-                      setFormData({ ...formData, privacyPolicy: isChecked });
-                      if (isChecked) {
+                    onChange={(e) => {
+                      setFormData({ ...formData, privacyPolicy: e.target.checked });
+                      if (e.target.checked) {
                         clearFieldError("privacyPolicy");
                       }
                     }}
+                    className="mt-1 h-4 w-4 shrink-0 rounded border-primary text-primary focus:ring-primary"
                   />
                   <label
                     htmlFor="agreeToprivacyandterms"
                     className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
                   >
-                    I agree to the{" "}
+                    By checking this box, you consent to receive text message from E-Health Jobs at the number provided. 
+                  Consent is not a condition of purchase. Message & data rates may apply. Message frequency varies. Unsubscribe by 
+                  replying STOP. Reply HELP for help or contact us at <a href="tel:+16465030970" className="underline text-blue-600">
+                      +1 646-503-0970
+                    </a> or email us at <a href="mailto:admin@e-healthjobs" className="underline text-blue-600">
+                      admin@e-healthjobs
+                    </a>. Phone numbers aren't 
+                  shared with third parties.{" "}
                     <Link
                       href="/privacy-policy"
                       target="_blank"
@@ -265,7 +282,7 @@ const ContactForm = () => {
                     >
                       Privacy Policy
                     </Link>{" "}
-                    and{" "}
+                    &{" "}
                     <Link
                       href="/terms-of-service"
                       target="_blank"
