@@ -5,11 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import Link from "next/link";
 import axiosInstance from "../lib/axiosInstance";
-import { useRouter } from "next/navigation";
 
 
 const initialFormData = {
@@ -34,8 +32,6 @@ const ContactForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const router = useRouter();
-
   const validateForm = () => {
     const nextErrors = {
       firstName: formData.FirstName.trim() ? "" : "First name is required.",
@@ -43,9 +39,10 @@ const ContactForm = () => {
       companyName: formData.companyName.trim() ? "" : "Company name is required.",
       email: formData.Email.trim() ? "" : "Email is required.",
       phone: "",
-      privacyPolicy: formData.privacyPolicy
-        ? ""
-        : "You must agree to the Privacy Policy and Terms of Service.",
+      privacyPolicy: "",
+      // privacyPolicy: formData.privacyPolicy
+      //   ? ""
+      //   : "You must agree to the Privacy Policy and Terms of Service.",
     };
 
     setErrors(nextErrors);
@@ -99,10 +96,10 @@ const ContactForm = () => {
       if (response.data.success || response.data.result?.success) {
           // toast.success('Form submitted successfully!');
           toast.success("Thank you! We'll contact you soon.");
-          setIsSubmitting(false);
           setTimeout(() => {
-              router.push('/');
+              window.location.href = '/';
           }, 100);
+          setIsSubmitting(false);
       } else {
         toast.error(response.data.message || 'Form submission failed.');
         setIsSubmitting(false);

@@ -136,11 +136,7 @@ export default function PrivacyPolicyPage() {
 
               <h3 className="pp-sub-heading">How We Use Your Mobile Number</h3>
               <p>
-                We use your mobile number exclusively for the purposes outlined above.
-                We do not sell or share your mobile number with third parties for their
-                own marketing purposes. Your phone number may be shared with trusted
-                vendors or platforms strictly for the purpose of enabling SMS delivery
-                on our behalf.
+                We use your mobile number exclusively for the purposes outlined above. We do not sell, share, or disclose your mobile phone number to any third parties for their own marketing or solicitation purposes. Your phone number may only be shared with trusted technology vendors or delivery platforms strictly for the purpose of enabling SMS communications on our behalf — and those vendors are prohibited from using it for any other purpose.
               </p>
 
               <h3 className="pp-sub-heading">Opt-Out and Help</h3>
@@ -161,9 +157,7 @@ export default function PrivacyPolicyPage() {
               <div className="pp-important">
                 <strong>IMPORTANT:</strong>{" "}
                 <em>
-                  Mobile numbers collected for SMS consent will never be shared with
-                  any third parties or affiliates for marketing purposes. Consent to
-                  receive SMS is not a condition of receiving our services.
+                  Your mobile phone number will never be sold, rented, or shared with any third parties or affiliates for marketing or solicitation purposes. Consent to receive SMS is not a condition of receiving our services.
                 </em>
               </div>
 
@@ -218,10 +212,7 @@ export default function PrivacyPolicyPage() {
                 </li>
               </ul>
               <p>
-                For these purposes we may contact you via email, telephone, text
-                messages, or postal mail. We will not contact you for purposes
-                unrelated to our recruitment and staffing services without your
-                consent.
+                For these purposes we may contact you via email, telephone, text messages, or postal mail. We will not contact you for purposes unrelated to our recruitment services without your consent.
               </p>
             </Section>
 
