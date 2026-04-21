@@ -98,7 +98,7 @@ const ContactForm = () => {
           toast.success("Thank you! We'll contact you soon.");
           setTimeout(() => {
               window.location.href = '/';
-          }, 100);
+          }, 500);
           setIsSubmitting(false);
       } else {
         toast.error(response.data.message || 'Form submission failed.');
