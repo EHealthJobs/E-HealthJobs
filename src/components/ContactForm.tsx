@@ -263,7 +263,7 @@ const ContactForm = () => {
                     htmlFor="agreeToprivacyandterms"
                     className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
                   >
-                    By checking this box, you consent to receive text message from E-Health Jobs at the number provided. 
+                    By checking this box, you consent to receive customer care messages from E-Health Jobs at the number provided. 
                   Consent is not a condition of purchase. Message & data rates may apply. Message frequency varies. Unsubscribe by 
                   replying STOP. Reply HELP for help or contact us at <a href="tel:+16465030970" className="underline text-blue-600">
                       +1 646-503-0970
