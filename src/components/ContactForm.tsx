@@ -39,10 +39,9 @@ const ContactForm = () => {
       companyName: formData.companyName.trim() ? "" : "Company name is required.",
       email: formData.Email.trim() ? "" : "Email is required.",
       phone: "",
-      privacyPolicy: "",
-      // privacyPolicy: formData.privacyPolicy
-      //   ? ""
-      //   : "You must agree to the Privacy Policy and Terms of Service.",
+      privacyPolicy: formData.privacyPolicy
+        ? ""
+        : "You must agree to receive SMS messages to submit this form.",
     };
 
     setErrors(nextErrors);
@@ -263,14 +262,12 @@ const ContactForm = () => {
                     htmlFor="agreeToprivacyandterms"
                     className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
                   >
-                    By checking this box, you consent to receive customer care messages from E-Health Jobs at the number provided. 
-                  Consent is not a condition of purchase. Message & data rates may apply. Message frequency varies. Unsubscribe by 
-                  replying STOP. Reply HELP for help or contact us at <a href="tel:+16465030970" className="underline text-blue-600">
+                    By checking this box, you consent to receive customer care text messages from E-Health Jobs at the number provided, including application updates, interview scheduling, job opportunities, and account notifications. Msg frequency varies. Msg & data rates may apply. Reply STOP to unsubscribe or HELP for help. For assistance, call <a href="tel:+16465030970" className="underline text-blue-600">
                       +1 646-503-0970
-                    </a> or email us at <a href="mailto:admin@e-healthglobal.us" className="underline text-blue-600">
+                    </a> or email <a href="mailto:admin@e-healthglobal.us" className="underline text-blue-600">
                       admin@e-healthglobal.us
                     </a>. Phone numbers aren't 
-                  shared with third parties.{" "}
+                  shared with third parties for marketing purposes. See our{" "}
                     <Link
                       href="/privacy-policy"
                       target="_blank"
@@ -279,7 +276,7 @@ const ContactForm = () => {
                     >
                       Privacy Policy
                     </Link>{" "}
-                    &{" "}
+                    and{" "}
                     <Link
                       href="/terms-of-service"
                       target="_blank"
@@ -287,7 +284,7 @@ const ContactForm = () => {
                       className="underline text-blue-600"
                     >
                       Terms of Service
-                    </Link>.
+                    </Link>. Consent is not a condition of purchase.
                   </label>
                 </div>
                 {errors.privacyPolicy && (
