@@ -13,8 +13,8 @@ export default function FieldRow({ field, value, isEditing, onChange, error, tou
   }
 
   return (
-    <div id={`view-field-${field.key}`} style={{ display: "grid", gridTemplateColumns: "260px 1fr", alignItems: "start", padding: "12px 0", borderBottom: "1px solid #f0f2f5", gap: 12 }}>
-      <span style={{ fontSize: 12, fontWeight: 600, color: showError ? "#b91c1c" : "#374151", paddingTop: isEditing ? 10 : 3, paddingRight: 12 }}>
+    <div id={`view-field-${field.key}`} style={{ minWidth: 0, gridColumn: field.fullWidth ? "1 / -1" : undefined }}>
+      <span style={{ display: "block", fontSize: 12, fontWeight: 600, color: showError ? "#b91c1c" : "#374151", marginBottom: 6 }}>
         {field.label}
         {field.required && <span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>}
       </span>
@@ -28,7 +28,7 @@ export default function FieldRow({ field, value, isEditing, onChange, error, tou
               </div>
             )}
           </div>
-        : <span style={{ fontSize: 13, color: empty ? "#adb5bd" : "#1a2332", fontStyle: empty ? "italic" : "normal", paddingTop: 3 }}>
+        : <span style={{ display: "block", minHeight: 36, borderWidth: 1, borderStyle: "solid", borderColor: "#eef1f4", borderRadius: 6, backgroundColor: "#fafbfc", padding: "9px 12px", fontSize: 13, color: empty ? "#adb5bd" : "#1a2332", fontStyle: empty ? "italic" : "normal", overflowWrap: "anywhere" }}>
             {empty ? "-" : displayValue}
           </span>
       }

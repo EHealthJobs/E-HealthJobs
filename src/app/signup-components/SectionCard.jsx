@@ -8,12 +8,27 @@ const PencilIcon = () => (
   </svg>
 );
 
-export default function SectionCard({ step, data, sectionEditing, onEdit, onSave, onChange, errors = {}, submitAttempted = false }) {
+export default function SectionCard({ step, data, sectionEditing, onEdit, onSave, onChange, errors = {}, submitAttempted = false, isSaving = false }) {
   const editing = sectionEditing === step.id;
   const errorCount = Object.keys(errors).length;
+  const visibleFields = step.fields.filter(f => f.type !== "password" && f.type !== "hidden" && f.type !== "file");
 
   return (
     <div style={{ backgroundColor: "#fff", borderWidth: 1, borderStyle: "solid", borderColor: "#e2e5ea", borderRadius: 8, marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,.06)" }}>
+      <style>{`
+        .profile-section-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          column-gap: 24px;
+          row-gap: 18px;
+        }
+
+        @media (max-width: 700px) {
+          .profile-section-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", backgroundColor: "#f8f9fb", borderBottom: "1px solid #e2e5ea" }}>
         <div>
           <span style={{ fontSize: 14, fontWeight: 600, color: "#1a2332", display: "block" }}>{step.label}</span>
@@ -27,13 +42,13 @@ export default function SectionCard({ step, data, sectionEditing, onEdit, onSave
           ? <button onClick={() => onEdit(step.id)} style={{ display: "flex", alignItems: "center", gap: 5, backgroundColor: "transparent", borderWidth: 1, borderStyle: "solid", borderColor: "#cdd4da", borderRadius: 4, padding: "4px 10px", cursor: "pointer", fontSize: 12, color: "#0176d3", fontFamily: "'DM Sans', sans-serif" }}>
               <PencilIcon /> Edit
             </button>
-          : <button onClick={() => onSave(step.id)} style={{ display: "flex", alignItems: "center", gap: 5, backgroundColor: "#0176d3", borderWidth: 0, borderStyle: "solid", borderColor: "transparent", borderRadius: 4, padding: "5px 14px", cursor: "pointer", fontSize: 12, color: "#fff", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
-              <CheckIcon /> Save
+          : <button onClick={() => onSave(step.id)} disabled={isSaving} style={{ display: "flex", alignItems: "center", gap: 5, backgroundColor: "#0176d3", borderWidth: 0, borderStyle: "solid", borderColor: "transparent", borderRadius: 4, padding: "5px 14px", cursor: isSaving ? "not-allowed" : "pointer", opacity: isSaving ? 0.65 : 1, fontSize: 12, color: "#fff", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+              <CheckIcon /> {isSaving ? "Saving..." : "Save"}
             </button>
         }
       </div>
-      <div style={{ padding: "4px 20px 8px" }}>
-        {step.fields.map(f => (
+      <div className="profile-section-grid" style={{ padding: "18px 20px 20px" }}>
+        {visibleFields.map(f => (
           <FieldRow
             key={f.key}
             field={f}

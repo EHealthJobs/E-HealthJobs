@@ -1,8 +1,8 @@
 "use client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import SectionCard from "../signup-components/SectionCard";
 import StepBar from "../signup-components/StepBar";
 import FormField from "../signup-components/FormField";
@@ -24,9 +24,65 @@ const dataWithFieldDefaults = (formData) => ({
   ),
 });
 
-export default function SignUp() {
+const CONTACT_FIELD_ALIASES = {
+  City: ["MailingCity", "City__c"],
+  State: ["MailingState", "MailingStateCode", "State__c"],
+  MailingCountryText: ["MailingCountry", "MailingCountryCode", "MailingCountryText__c"],
+  TimeZone: ["Time_Zone__c"],
+  Source: ["Source__c", "LeadSource"],
+  WhatsAppNumber: ["WhatsApp_Number__c", "Whatsapp_Number__c"],
+  What_units_are_you_open_to: ["What_units_are_you_open_to__c"],
+  What_shift_s_are_you_open_to: ["What_shift_s_are_you_open_to__c"],
+  Location_s_Desired: ["Location_s_Desired__c"],
+  Any_preferences_on_part_of_the_country: ["Any_preferences_on_part_of_the_country__c"],
+  Any_family_or_friends_in_the_US: ["Any_family_or_friends_in_the_US__c"],
+  Are_you_open_to_city_and_rural_areas: ["Are_you_open_to_city_and_rural_areas__c"],
+  Max_Commuting_Distance_Time: ["Max_Commuting_Distance_Time__c"],
+  Employment_Status: ["Employment_Status__c"],
+  Employment_Type: ["Employment_Type__c"],
+  Country_of_origin: ["Country_of_origin__c"],
+  CountryOfResidence: ["Country_of_residence__c", "CountryOfResidence__c"],
+  Country_of_Citizenship_1: ["Country_of_Citizenship_1__c"],
+  Country_of_Citizenship: ["Country_of_Citizenship__c"],
+  Applying_for_another_citizenship_1: ["Applying_for_another_citizenship_1__c"],
+  Moving_with_anyone_Pets: ["Moving_with_anyone_Pets__c"],
+  Spouse_Employment_Need: ["Spouse_Employment_Need__c", "spouse_job"],
+};
+
+const unwrapContact = (payload) => {
+  if (Array.isArray(payload)) return payload[0] || {};
+  return payload?.contact || payload?.data || payload?.record || payload || {};
+};
+
+const getContactValue = (contact, key) => {
+  const possibleKeys = [key, `${key}__c`, ...(CONTACT_FIELD_ALIASES[key] || [])];
+  const matchedKey = possibleKeys.find(item => contact[item] !== undefined && contact[item] !== null);
+  return matchedKey ? contact[matchedKey] : "";
+};
+
+const dataFromContact = (contactPayload) => {
+  const contact = unwrapContact(contactPayload);
+  const nextData = dataWithFieldDefaults({});
+
+  STEPS.flatMap(section => section.fields).forEach(field => {
+    if (field.type === "password" || field.type === "file") return;
+
+    const value = getContactValue(contact, field.key);
+    if (value !== "") nextData[field.key] = value;
+  });
+
+  return nextData;
+};
+
+const viewFieldsForSection = (section) => ({
+  ...section,
+  fields: section.fields.filter(field => field.type !== "password" && field.type !== "file" && field.type !== "hidden"),
+});
+
+function SignUpContent() {
   const router = useRouter();
-  const [mode] = useState("signup");
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode") === "view" ? "view" : "signup";
   const [currentStep, setCurrentStep] = useState(0);
   const [completed, setCompleted] = useState([]);
   const [data, setData] = useState(() => emptyData());
@@ -35,8 +91,47 @@ export default function SignUp() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [viewSubmitAttempted, setViewSubmitAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingContact, setIsLoadingContact] = useState(false);
+  const [contactError, setContactError] = useState("");
+  const [savingSection, setSavingSection] = useState(null);
 
   const step = STEPS[currentStep];
+
+  useEffect(() => {
+    if (mode !== "view") return;
+
+    let isMounted = true;
+
+    const loadContactDetails = async () => {
+      setIsLoadingContact(true);
+      setContactError("");
+
+      try {
+        const response = await fetch("/api/contactDetails", { cache: "no-store" });
+        const result = await response.json();
+
+        if (!isMounted) return;
+
+        if (!response.ok || !result.success) {
+          setContactError(result.message || "Unable to load contact details.");
+          return;
+        }
+
+        setData(dataFromContact(result.contact));
+      } catch (err) {
+        console.error("Contact details load error:", err);
+        if (isMounted) setContactError("Unable to load contact details.");
+      } finally {
+        if (isMounted) setIsLoadingContact(false);
+      }
+    };
+
+    loadContactDetails();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [mode]);
 
   const isValueEmpty = (field, val) => {
     if (field.type === "file") return !val || !val.name;
@@ -150,14 +245,14 @@ export default function SignUp() {
     setErrors({});
   };
 
-  const handleSaveSection = (sectionId) => {
+  const handleSaveSection = async (sectionId) => {
     const section = STEPS.find(item => item.id === sectionId);
     if (!section) return;
 
     setViewSubmitAttempted(true);
     const nextData = dataWithFieldDefaults(data);
     setData(nextData);
-    const sectionErrors = validateStep(section, nextData);
+    const sectionErrors = validateStep(viewFieldsForSection(section), nextData);
     if (Object.keys(sectionErrors).length > 0) {
       setErrors(sectionErrors);
       const firstKey = Object.keys(sectionErrors)[0];
@@ -165,9 +260,33 @@ export default function SignUp() {
       return;
     }
 
-    setErrors({});
-    setViewSubmitAttempted(false);
-    setSectionEditing(null);
+    setSavingSection(sectionId);
+
+    try {
+      const response = await fetch("/api/contactDetails", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(nextData),
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        toast.error(result.message || "Unable to save contact details.");
+        return;
+      }
+
+      toast.success("Profile updated successfully.");
+      setErrors({});
+      setViewSubmitAttempted(false);
+      setSectionEditing(null);
+    } catch (err) {
+      console.error("Contact save error:", err);
+      toast.error("Unable to save contact details.");
+    } finally {
+      setSavingSection(null);
+    }
   };
 
   const errorCount = Object.keys(errors).length;
@@ -185,6 +304,24 @@ export default function SignUp() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#1a2332" }}>Profile Overview</h2>
           </div>
+
+          {isLoadingContact && (
+            <div style={{ backgroundColor: "#fff", borderWidth: 1, borderStyle: "solid", borderColor: "#e2e5ea", borderRadius: 8, padding: "12px 16px", marginBottom: 16, color: "#374151", fontSize: 13 }}>
+              Loading contact details...
+            </div>
+          )}
+
+          {contactError && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 10,
+              backgroundColor: "#fef2f2", borderWidth: 1, borderStyle: "solid", borderColor: "#fca5a5",
+              borderRadius: 8, padding: "12px 16px", marginBottom: 16,
+              color: "#b91c1c", fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+            }}>
+              <AlertIcon />
+              <span>{contactError}</span>
+            </div>
+          )}
 
           {sectionEditing && viewSubmitAttempted && errorCount > 0 && (
             <div style={{
@@ -209,6 +346,7 @@ export default function SignUp() {
               onChange={handleChange}
               errors={sectionEditing === section.id ? errors : {}}
               submitAttempted={sectionEditing === section.id && viewSubmitAttempted}
+              isSaving={savingSection === section.id}
             />
           ))}
         </div>
@@ -336,3 +474,11 @@ const pageStyle = {
   minHeight: "100vh",
   backgroundColor: "#f3f5f8",
 };
+
+export default function SignUp() {
+  return (
+    <Suspense fallback={null}>
+      <SignUpContent />
+    </Suspense>
+  );
+}

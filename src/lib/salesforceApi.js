@@ -58,7 +58,6 @@ export async function salesforceService() {
 export async function commonApiCallingMethod(url){
   try {
           const conn = await salesforceService();
-          const options = {}
            const fetchUrl = `${conn.instanceUrl.replace(/\/+$/,'')}/${url.replace(/^\/+/,'')}`;
             console.log("Calling Salesforce URL:", fetchUrl);
 
@@ -91,6 +90,40 @@ export async function commonApiCallingMethod(url){
         // throw new Error(`Salesforce Authentication Failed: ${error.message}`);
           return { error: true, message: error?.message ?? 'Unknown error' };
       }
+}
+
+export async function salesforceApiRequest(url, { method = "GET", body } = {}) {
+  try {
+    const conn = await salesforceService();
+    const fetchUrl = `${conn.instanceUrl.replace(/\/+$/,'')}/${url.replace(/^\/+/,'')}`;
+    console.log("Calling Salesforce URL:", fetchUrl);
+
+    const response = await fetch(fetchUrl, {
+      method,
+      headers: {
+        'Authorization': `Bearer ${conn.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
+
+    if (!response.ok) {
+      return {
+        error: true,
+        status: response.status,
+        message: data?.message || response.statusText || "Salesforce request failed",
+        data,
+      };
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Salesforce request error:", error);
+    return { error: true, message: error?.message ?? 'Unknown error' };
+  }
 }
 
 export function buildFetchURL(cond = [], limit = 10, offset = 0) {

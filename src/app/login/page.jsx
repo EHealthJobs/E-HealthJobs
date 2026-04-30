@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import AlertIcon from "../signup-components/AlertIcon";
 import CheckIcon from "../signup-components/CheckIcon";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const loginFields = [
   {
@@ -30,12 +31,16 @@ const initialData = {
 };
 
 export default function Login() {
+  const router = useRouter();
   const [data, setData] = useState(initialData);
   const [errors, setErrors] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverMessage, setServerMessage] = useState("");
 
   const handleChange = (key, value) => {
     setData(prev => ({ ...prev, [key]: value }));
+    setServerMessage("");
     setErrors(prev => {
       const next = { ...prev };
       delete next[key];
@@ -58,9 +63,10 @@ export default function Login() {
     return nextErrors;
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
     setSubmitAttempted(true);
+    setServerMessage("");
 
     const nextErrors = validateForm();
     if (Object.keys(nextErrors).length > 0) {
@@ -71,6 +77,34 @@ export default function Login() {
     }
 
     setErrors({});
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setServerMessage(result.message || "Unable to log in. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      router.push("/signup?mode=view");
+    } catch (err) {
+      console.error("Login error:", err);
+      setServerMessage("Unable to log in right now. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   const errorCount = Object.keys(errors).length;
@@ -122,6 +156,13 @@ export default function Login() {
           <div style={alertStyle}>
             <AlertIcon />
             <span>Please fill in all required fields before continuing. <strong>{errorCount} field{errorCount > 1 ? "s" : ""}</strong> need{errorCount === 1 ? "s" : ""} attention.</span>
+          </div>
+        )}
+
+        {serverMessage && (
+          <div style={alertStyle}>
+            <AlertIcon />
+            <span>{serverMessage}</span>
           </div>
         )}
 
@@ -177,9 +218,17 @@ export default function Login() {
                 </a>
               </div>
 
-              <button type="submit" style={buttonStyle}>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  ...buttonStyle,
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                  opacity: isSubmitting ? 0.65 : 1,
+                }}
+              >
                 <CheckIcon />
-                Login
+                {isSubmitting ? "Logging in..." : "Login"}
               </button>
 
               <p style={{ margin: 0, textAlign: "center", color: "#6b7280", fontSize: 13 }}>
