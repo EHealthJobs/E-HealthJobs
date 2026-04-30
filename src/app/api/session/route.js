@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 
 const getSessionSecret = () =>
-  process.env.AUTH_SESSION_SECRET;
+  process.env.NEXT_PUBLIC_AUTH_SESSION_SECRET;
 
 const verifySessionToken = (token) => {
   if (!token || !token.includes(".")) return null;

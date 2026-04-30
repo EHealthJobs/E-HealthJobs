@@ -4,7 +4,7 @@ import crypto from "crypto";
 import pool from "../../../lib/db";
 
 const getSessionSecret = () =>
-  process.env.AUTH_SESSION_SECRET;
+  process.env.NEXT_PUBLIC_AUTH_SESSION_SECRET;
 
 const createSessionToken = (payload) => {
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
