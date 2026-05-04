@@ -39,9 +39,10 @@ const ContactForm = () => {
       companyName: formData.companyName.trim() ? "" : "Company name is required.",
       email: formData.Email.trim() ? "" : "Email is required.",
       phone: "",
-      privacyPolicy: formData.privacyPolicy
-        ? ""
-        : "You must agree to receive SMS messages to submit this form.",
+      // privacyPolicy: formData.privacyPolicy
+      //   ? ""
+      //   : "You must agree to receive SMS messages to submit this form.",
+      privacyPolicy: "",
     };
 
     setErrors(nextErrors);
