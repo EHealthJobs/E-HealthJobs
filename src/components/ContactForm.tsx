@@ -263,7 +263,7 @@ const ContactForm = () => {
                     htmlFor="agreeToprivacyandterms"
                     className="text-sm text-muted-foreground leading-relaxed cursor-pointer"
                   >
-                    By checking this box, you consent to receive customer care text messages from E-Health Jobs at the number provided, including application updates, interview scheduling, job opportunities, and account notifications. Msg frequency varies. Msg & data rates may apply. Reply STOP to unsubscribe or HELP for help. For assistance, call <a href="tel:+16465030970" className="underline text-blue-600">
+                    By checking this box, you consent to receive transactional and job-related text messages from E-Health Jobs at the number provided, including application updates, interview scheduling, job opportunities, and account notifications. Msg frequency varies. Msg & data rates may apply. Reply STOP to unsubscribe or HELP for help. For assistance, call <a href="tel:+16465030970" className="underline text-blue-600">
                       +1 646-503-0970
                     </a> or email <a href="mailto:admin@e-healthglobal.us" className="underline text-blue-600">
                       admin@e-healthglobal.us
