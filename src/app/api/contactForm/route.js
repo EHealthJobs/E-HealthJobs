@@ -21,6 +21,7 @@ export async function POST(req) {
     const rawData = {};
     let attachmentFile = null;
     const form = await req.formData();
+    console.log("Received form data keys:", Array.from(form.keys())); 
     const contentType = req.headers.get("content-type") || "";
 
     const firstName = form.get("FirstName");
@@ -147,12 +148,12 @@ export async function POST(req) {
         rawData.Attachment = {
           fileName: attachmentFile.name,
           base64Data: base64,
-          documentCategory: rawData.documentCategory || "",
-          documentType: rawData.documentType || "",
-          documentStatus: rawData.documentStatus || "",
-          expirationDate: rawData.expirationDate || "",
-          notes: rawData.notes || "",
-          isRequired: toBoolean(rawData.isRequired),
+          documentCategory: rawData.DocumentCategory || "",
+          documentType: rawData.DocumentType || "",
+          documentStatus: rawData.DocumentStatus || "",
+          expirationDate: rawData.DocumentExpirationDate || "",
+          notes: rawData.DocumentNotes || "",
+          isRequired: toBoolean(rawData.DocumentIsRequired),
         };
 
         console.log(`File processed successfully: ${attachmentFile.name}`);
