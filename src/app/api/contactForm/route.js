@@ -9,6 +9,11 @@ const getSalesforceContactId = (result) => {
   );
 };
 
+const toBoolean = (value) => {
+  if (typeof value === "boolean") return value;
+  return String(value || "").toLowerCase() === "true";
+};
+
 export async function POST(req) {
   let client;
 
@@ -142,6 +147,12 @@ export async function POST(req) {
         rawData.Attachment = {
           fileName: attachmentFile.name,
           base64Data: base64,
+          documentCategory: rawData.DocumentCategory || "",
+          documentType: rawData.DocumentType || "",
+          documentStatus: rawData.DocumentStatus || "",
+          expirationDate: rawData.DocumentExpirationDate || "",
+          notes: rawData.DocumentNotes || "",
+          isRequired: toBoolean(rawData.DocumentIsRequired),
         };
 
         console.log(`File processed successfully: ${attachmentFile.name}`);

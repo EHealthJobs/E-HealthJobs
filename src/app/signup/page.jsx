@@ -402,6 +402,7 @@ function SignUpContent() {
                       onChange={handleChange}
                       error={errors[field.key]}
                       touched={submitAttempted}
+                      formData={data}
                     />
                   );
                 }
@@ -417,7 +418,7 @@ function SignUpContent() {
                       {field.required && <span style={{ color: "#ef4444" }}>*</span>}
                     </label>
 
-                    <FormField field={field} value={data[field.key]} onChange={handleChange} error={errors[field.key]} touched={submitAttempted} />
+                    <FormField field={field} value={data[field.key]} onChange={handleChange} error={errors[field.key]} touched={submitAttempted} formData={data} />
 
                     {hasError && (
                       <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 5, color: "#ef4444", fontSize: 12 }}>
