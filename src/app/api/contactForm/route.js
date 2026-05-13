@@ -147,12 +147,12 @@ export async function POST(req) {
         rawData.Attachment = {
           fileName: attachmentFile.name,
           base64Data: base64,
-          documentCategory: rawData.DocumentCategory || "",
-          documentType: rawData.DocumentType || "",
-          documentStatus: rawData.DocumentStatus || "",
-          expirationDate: rawData.DocumentExpirationDate || "",
-          notes: rawData.DocumentNotes || "",
-          isRequired: toBoolean(rawData.DocumentIsRequired),
+          documentCategory: rawData.documentCategory || "",
+          documentType: rawData.documentType || "",
+          documentStatus: rawData.documentStatus || "",
+          expirationDate: rawData.expirationDate || "",
+          notes: rawData.notes || "",
+          isRequired: toBoolean(rawData.isRequired),
         };
 
         console.log(`File processed successfully: ${attachmentFile.name}`);
