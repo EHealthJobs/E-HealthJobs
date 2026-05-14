@@ -51,7 +51,7 @@ const CONTACT_FIELD_ALIASES = {
 
 const unwrapContact = (payload) => {
   if (Array.isArray(payload)) return payload[0] || {};
-  return payload?.contact || payload?.data || payload?.record || payload || {};
+  return payload?.contact?.contact || payload?.contact || payload?.data || payload?.record || payload || {};
 };
 
 const getContactValue = (contact, key) => {
@@ -61,7 +61,10 @@ const getContactValue = (contact, key) => {
 };
 
 const dataFromContact = (contactPayload) => {
+  const contactRoot = Array.isArray(contactPayload) ? contactPayload[0] || {} : contactPayload || {};
   const contact = unwrapContact(contactPayload);
+  const document = contactRoot?.document || {};
+  const attachment = document?.attachment || {};
   const nextData = dataWithFieldDefaults({});
 
   STEPS.flatMap(section => section.fields).forEach(field => {
@@ -71,6 +74,22 @@ const dataFromContact = (contactPayload) => {
     if (value !== "") nextData[field.key] = value;
   });
 
+  if (document && Object.keys(document).length > 0) {
+    nextData.DocumentCategory = document.documentCategory || "";
+    nextData.DocumentType = document.documentType || "";
+    nextData.DocumentStatus = document.documentStatus || "Requested";
+    nextData.DocumentExpirationDate = document.expirationDate || "";
+    nextData.DocumentNotes = document.notes || "";
+    nextData.DocumentIsRequired = Boolean(document.isRequired);
+  }
+
+  if (attachment && Object.keys(attachment).length > 0) {
+    nextData.Attachment = {
+      ...attachment,
+      name: attachment.fileName || attachment.pathOnClient || attachment.name || "",
+    };
+  }
+
   return nextData;
 };
 
@@ -78,6 +97,22 @@ const viewFieldsForSection = (section) => ({
   ...section,
   fields: section.fields.filter(field => field.type !== "password" && field.type !== "file" && field.type !== "hidden"),
 });
+
+const hasUploadFile = (formData) => {
+  const attachment = formData.Attachment;
+  return Boolean(attachment?.name && attachment?.size);
+};
+
+const toMultipartFormData = (formData) => {
+  const multipartData = new FormData();
+
+  Object.entries(formData).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    multipartData.append(key, value);
+  });
+
+  return multipartData;
+};
 
 function SignUpContent() {
   const router = useRouter();
@@ -134,7 +169,7 @@ function SignUpContent() {
   }, [mode]);
 
   const isValueEmpty = (field, val) => {
-    if (field.type === "file") return !val || !val.name;
+    if (field.type === "file") return !val || !(val.name || val.fileName);
     return !val || val.toString().trim() === "";
   };
 
@@ -263,12 +298,13 @@ function SignUpContent() {
     setSavingSection(sectionId);
 
     try {
+      const bodyHasUpload = hasUploadFile(nextData);
       const response = await fetch("/api/contactDetails", {
         method: "PATCH",
-        headers: {
+        headers: bodyHasUpload ? undefined : {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(nextData),
+        body: bodyHasUpload ? toMultipartFormData(nextData) : JSON.stringify(nextData),
       });
       const result = await response.json();
 

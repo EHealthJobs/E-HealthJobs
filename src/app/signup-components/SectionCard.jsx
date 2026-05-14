@@ -11,7 +11,7 @@ const PencilIcon = () => (
 export default function SectionCard({ step, data, sectionEditing, onEdit, onSave, onChange, errors = {}, submitAttempted = false, isSaving = false }) {
   const editing = sectionEditing === step.id;
   const errorCount = Object.keys(errors).length;
-  const visibleFields = step.fields.filter(f => f.type !== "password" && f.type !== "hidden" && f.type !== "file");
+  const visibleFields = step.fields.filter(f => f.type !== "password" && f.type !== "hidden");
 
   return (
     <div style={{ backgroundColor: "#fff", borderWidth: 1, borderStyle: "solid", borderColor: "#e2e5ea", borderRadius: 8, marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,.06)" }}>
@@ -57,6 +57,7 @@ export default function SectionCard({ step, data, sectionEditing, onEdit, onSave
             onChange={onChange}
             error={errors[f.key]}
             touched={submitAttempted}
+            formData={data}
           />
         ))}
       </div>

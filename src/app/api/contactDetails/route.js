@@ -25,6 +25,61 @@ const verifySessionToken = (token) => {
   }
 };
 
+const toBoolean = (value) => {
+  if (typeof value === "boolean") return value;
+  return String(value || "").toLowerCase() === "true";
+};
+
+const hasDocumentMetadata = (data) => (
+  data.DocumentCategory !== undefined ||
+  data.DocumentType !== undefined ||
+  data.DocumentStatus !== undefined ||
+  data.DocumentExpirationDate !== undefined ||
+  data.DocumentNotes !== undefined ||
+  data.DocumentIsRequired !== undefined
+);
+
+const buildDocumentMetadata = (data) => ({
+  documentCategory: data.DocumentCategory || "",
+  documentType: data.DocumentType || "",
+  documentStatus: data.DocumentStatus || "",
+  expirationDate: data.DocumentExpirationDate || "",
+  notes: data.DocumentNotes || "",
+  isRequired: toBoolean(data.DocumentIsRequired),
+});
+
+const fileToBase64 = async (file) => {
+  if (typeof file.arrayBuffer === "function") {
+    const buffer = await file.arrayBuffer();
+    return Buffer.from(buffer).toString("base64");
+  }
+
+  if (file.stream && typeof file.stream === "function") {
+    const stream = file.stream();
+    const reader = stream.getReader();
+    const chunks = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+
+    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+    const uint8Array = new Uint8Array(totalLength);
+    let offset = 0;
+
+    chunks.forEach(chunk => {
+      uint8Array.set(chunk, offset);
+      offset += chunk.length;
+    });
+
+    return Buffer.from(uint8Array).toString("base64");
+  }
+
+  throw new Error("Unable to read file - unsupported file object");
+};
+
 export async function GET(req) {
   const session = verifySessionToken(req.cookies.get("session")?.value);
 
@@ -72,12 +127,56 @@ export async function PATCH(req) {
   }
 
   try {
-    const formData = await req.json();
-    const updateData = { ...formData };
+    const contentType = req.headers.get("content-type") || "";
+    const updateData = {};
+    let attachmentFile = null;
+
+    if (contentType.includes("multipart/form-data")) {
+      const form = await req.formData();
+
+      for (const [key, value] of form.entries()) {
+        if (key === "Attachment" && value && typeof value === "object" && value.size && value.name) {
+          attachmentFile = value;
+        } else {
+          updateData[key] = value;
+        }
+      }
+    } else {
+      Object.assign(updateData, await req.json());
+    }
 
     delete updateData.Password;
     delete updateData.ConfirmPassword;
-    delete updateData.Attachment;
+
+    if (hasDocumentMetadata(updateData)) {
+      updateData.Attachment = buildDocumentMetadata(updateData);
+    } else {
+      delete updateData.Attachment;
+    }
+
+    if (attachmentFile) {
+      const maxSize = 2 * 1024 * 1024;
+      if (attachmentFile.size > maxSize) {
+        return NextResponse.json(
+          { success: false, message: "File size too large. Please use a file smaller than 2MB." },
+          { status: 400 }
+        );
+      }
+
+      const base64Data = await fileToBase64(attachmentFile);
+      if (!base64Data) {
+        return NextResponse.json(
+          { success: false, message: "Failed to convert file to base64." },
+          { status: 400 }
+        );
+      }
+
+      updateData.Attachment = {
+        ...(updateData.Attachment || {}),
+        fileName: attachmentFile.name,
+        base64Data,
+      };
+    }
 
     const result = await salesforceApiRequest(
       `services/apexrest/eHealthContactApi/${encodeURIComponent(session.contactId)}`,

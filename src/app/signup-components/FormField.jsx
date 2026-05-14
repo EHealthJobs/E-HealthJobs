@@ -148,7 +148,7 @@ function SourceSelectField({ field, value, onChange, style }) {
 }
 
 function FileUploadField({ field, value, onChange, showError, formData }) {
-  const fileName = value?.name || "";
+  const fileName = value?.name || value?.fileName || value?.pathOnClient || "";
   const [isOpen, setIsOpen] = useState(false);
   const [draftFile, setDraftFile] = useState(value || "");
   const [draft, setDraft] = useState({
@@ -277,7 +277,7 @@ function FileUploadField({ field, value, onChange, showError, formData }) {
 
   const saveDocument = () => {
     const nextErrors = {};
-    if (!draftFile?.name) nextErrors.file = "Select File is required";
+    if (!(draftFile?.name || draftFile?.fileName || draftFile?.pathOnClient)) nextErrors.file = "Select File is required";
     if (!draft.category) nextErrors.category = "Document Category is required";
     if (!draft.type) nextErrors.type = "Document Type is required";
 
@@ -527,4 +527,3 @@ export default function FormField({ field, value, onChange, error, touched, form
     />
   );
 }
-
