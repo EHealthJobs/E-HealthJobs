@@ -74,15 +74,6 @@ const dataFromContact = (contactPayload) => {
     if (value !== "") nextData[field.key] = value;
   });
 
-  if (document && Object.keys(document).length > 0) {
-    nextData.DocumentCategory = document.documentCategory || "";
-    nextData.DocumentType = document.documentType || "";
-    nextData.DocumentStatus = document.documentStatus || "Requested";
-    nextData.DocumentExpirationDate = document.expirationDate || "";
-    nextData.DocumentNotes = document.notes || "";
-    nextData.DocumentIsRequired = Boolean(document.isRequired);
-  }
-
   if (attachment && Object.keys(attachment).length > 0) {
     nextData.Attachment = {
       ...attachment,
