@@ -68,7 +68,7 @@ const STEPS = [
       { key: "State",              label: "State / Province",                  type: "text",   placeholder: "NY",                    required: true,  maxLength: 80 },
       { key: "MailingCountryText", label: "Country",                           type: "country", placeholder: "Start typing a country...", required: true,  maxLength: 80 },
       { key: "TimeZone",          label: "Time Zone",                         type: "select", placeholder: "Select Time Zone",      required: true,
-        options: ["Eastern", "Central", "Mountain"] },
+        options: [] },
       { key: "Source",             label: "Where did you hear about us?",      type: "select", placeholder: "Select source",         required: true,
         options: ["Google", "LinkedIn", "Facebook", "Friend / Referral", "Job Board", "Email", "Other"] },
       {

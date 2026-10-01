@@ -48,14 +48,14 @@ const normalizeOptions = (options) => {
   }, []);
 };
 
-function SourceSelectField({ field, value, onChange, style }) {
+function PicklistSelectField({ field, value, onChange, style, dataKey, loadingLabel }) {
   const [options, setOptions] = useState(() => normalizeOptions(field.options || []));
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    const loadSourceOptions = async () => {
+    const loadOptions = async () => {
       setIsLoading(true);
 
       try {
@@ -65,21 +65,21 @@ function SourceSelectField({ field, value, onChange, style }) {
         if (!isMounted) return;
         if (!response.ok || result?.success === false) return;
 
-        const sourceOptions = normalizeOptions(result?.data?.source);
-        if (sourceOptions.length > 0) setOptions(sourceOptions);
+        const picklistOptions = normalizeOptions(result?.data?.[dataKey]);
+        if (picklistOptions.length > 0) setOptions(picklistOptions);
       } catch (err) {
-        console.error("Source picklist load error:", err);
+        console.error(`${dataKey} picklist load error:`, err);
       } finally {
         if (isMounted) setIsLoading(false);
       }
     };
 
-    loadSourceOptions();
+    loadOptions();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [dataKey]);
 
   return (
     <select
@@ -95,7 +95,7 @@ function SourceSelectField({ field, value, onChange, style }) {
         color: value ? "#1a2332" : "#9ca3af",
       }}
     >
-      <option value="">{isLoading ? "Loading source..." : field.placeholder}</option>
+      <option value="">{isLoading ? loadingLabel : field.placeholder}</option>
       {options.map(option => (
         <option key={option.value} value={option.value}>{option.label}</option>
       ))}
@@ -258,11 +258,26 @@ export default function FormField({ field, value, onChange, error, touched, form
   if (field.type === "select") {
     if (field.key === "Source") {
       return (
-        <SourceSelectField
+        <PicklistSelectField
           field={field}
           value={value}
           onChange={onChange}
           style={style}
+          dataKey="source"
+          loadingLabel="Loading source..."
+        />
+      );
+    }
+
+    if (field.key === "TimeZone") {
+      return (
+        <PicklistSelectField
+          field={field}
+          value={value}
+          onChange={onChange}
+          style={style}
+          dataKey="timeZone"
+          loadingLabel="Loading time zones..."
         />
       );
     }
